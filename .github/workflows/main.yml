@@ -3,19 +3,16 @@ name: Docker Image BUILD AND PUSH
 on:
   push:    
    branches:
-   - master
+   - main
    - release/*
   pull_request:
-    branches: [ "master" ]
+    branches: [ "main" ]
 
 jobs:
 
   buildAndpush:
 
     runs-on: ubuntu-latest
-    env:
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
 
     steps:
     - id: commit
@@ -23,9 +20,11 @@ jobs:
     - name: Docker Login
       uses: docker/login-action@v2.1.0
       with:
-        username: ${{ secrets.DOCKERHUB_USER }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        username: seapapa
+        password: cuiyan971010
     - uses: actions/checkout@v3
+      with: 
+        ref: main
     - name: Build the Docker image
       run: |
         docker build --no-cache . --file scripts/docker/web-ui/Dockerfile --tag seapapa/web_ui:${{ steps.commit.outputs.short }}
