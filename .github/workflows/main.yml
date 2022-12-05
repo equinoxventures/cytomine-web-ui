@@ -13,9 +13,6 @@ jobs:
   buildAndpush:
 
     runs-on: ubuntu-latest
-    env:
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
 
     steps:
     - id: commit
@@ -23,8 +20,8 @@ jobs:
     - name: Docker Login
       uses: docker/login-action@v2.1.0
       with:
-        username: ${{ secrets.DOCKERHUB_USER }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        username: seapapa
+        password: dckr_pat_y-koGhzYZ5v1WwqNBm3oDAYiJGk
     - uses: actions/checkout@v3
     - name: Build the Docker image
       run: |
