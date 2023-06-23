@@ -185,13 +185,13 @@ export default {
   padding: 0 3em;
 }
 
-.b-table.table-softwares div.table-wrapper.has-mobile-cards table.table tbody tr td.has-text-centered span.tag.is-danger i.fas.fa-times::before {
+.b-table.table-softwares div.table-wrapper.has-mobile-cards table.table tbody tr td.has-text-centered span.tag.is-danger i.fas.fa-times::before,
+.b-table.table-softwares div.table-wrapper.has-mobile-cards table.table tbody tr td.has-text-centered span.tag.is-success i.fa-check::before,
+.b-table div.table-wrapper.has-mobile-cards table.table tbody tr td.has-text-centered span.tag.is-danger i.fas.fa-times::before,
+.b-table div.table-wrapper.has-mobile-cards table.table tbody tr td.has-text-centered span.tag.is-success i.fa-check::before {
   margin-right: 6px;
 }
 
-.b-table.table-softwares div.table-wrapper.has-mobile-cards table.table tbody tr td.has-text-centered span.tag.is-success i.fa-check::before {
-  margin-right: 6px;
-}
 
 
 </style>

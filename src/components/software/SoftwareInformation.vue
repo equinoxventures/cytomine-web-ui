@@ -234,6 +234,7 @@ li {
 
 .box {
   position: relative;
+
 }
 
 .chart-container {
@@ -278,6 +279,11 @@ td.prop-label {
 
 td.prop-content {
   width: 100%;
+}
+
+td.prop-content span.tag.is-danger i.fas.fa-times::before,
+td.prop-content span.tag.is-success i.fa-check::before {
+  margin-right: 6px;
 }
 
 .description {
