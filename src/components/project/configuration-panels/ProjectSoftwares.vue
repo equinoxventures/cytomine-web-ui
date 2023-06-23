@@ -184,4 +184,14 @@ export default {
 .project-softwares-wrapper .table .button {
   padding: 0 3em;
 }
+
+.b-table.table-softwares div.table-wrapper.has-mobile-cards table.table tbody tr td.has-text-centered span.tag.is-danger i.fas.fa-times::before {
+  margin-right: 6px;
+}
+
+.b-table.table-softwares div.table-wrapper.has-mobile-cards table.table tbody tr td.has-text-centered span.tag.is-success i.fa-check::before {
+  margin-right: 6px;
+}
+
+
 </style>
