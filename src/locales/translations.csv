@@ -401,8 +401,11 @@ use-existing-ontology,Use existing ontology,Utiliser une ontologie existante,Usa
 select-ontology,Select ontology,Choisir l'ontologie,Seleccione ontología
 type,Type,Type,Tipo
 attached-files,Attached files,Fichiers joints,Archivos adjuntos
+snapshot-files,Snapshot,Fichiers joints,Archivos adjuntos
 no-attached-file,No attached file,Aucun fichier joint,Ningún archivo adjunto
 add-attached-file,Add an attached file,Ajouter un fichier joint,Adjuntar archivo
+no-attached-snapshot,No attached snapshot,Aucun fichier joint,Ningún archivo adjunto
+add-attached-snapshot,Add an attached snapshot,Ajouter un fichier joint,Adjuntar archivo
 choose-file-or-drop,Click and choose a file or drop it here,Cliquez ici ou glissez-déposez le fichier de votre choix,Haga clic y elija un archivo o suéltelo aquí
 click-or-drop-new-file,Click or drop new file to replace current one,Cliquez ici our glissez-déposez un nouveau fichier pour remplacer le fichier actuel,Haga clic o suelte el archivo nuevo para reemplazar el actual
 notif-success-attached-file-creation,File correctly attached,Le fichier joint a bien été uploadé,Archivo adjuntado correctamente
@@ -410,6 +413,11 @@ notif-error-attached-file-creation,Failed to attach the selected file,Une erreur
 notif-success-attached-file-deletion,Attached file {filename} correctly deleted,Le fichier joint {filename} a bien été supprimé,El archivo adjunto {filename} se ha eliminado correctamente
 notif-error-attached-file-deletion,Failed to delete attached file {filename},Une erreur a empêché la suppression du fichier joint {filename},Error al eliminar el archivo adjunto {filename}
 confirm-deletion-attached-file,Do you really want to delete attached file {filename}?,Êtes-vous sûr de vouloir supprimer le fichier joint {filename} ?,¿Realmente desea eliminar el archivo adjunto {filename}?
+notif-success-attached-snapshot-creation,Snapshot correctly attached,Le fichier joint a bien été uploadé,Archivo adjuntado correctamente
+notif-error-attached-snapshot-creation,Failed to attach the selected snapshot,Une erreur a empêché l'upload du fichier joint,Error al adjuntar el archivo seleccionado
+notif-success-attached-snapshot-deletion,Attached snapshot {filename} correctly deleted,Le fichier joint {filename} a bien été supprimé,El archivo adjunto {filename} se ha eliminado correctamente
+notif-error-attached-snapshot-deletion,Failed to delete attached snapshot {filename},Une erreur a empêché la suppression du fichier joint {filename},Error al eliminar el archivo adjunto {filename}
+confirm-deletion-attached-snapshot,Do you really want to delete attached snapshot {filename}?,Êtes-vous sûr de vouloir supprimer le fichier joint {filename} ?,¿Realmente desea eliminar el archivo adjunto {filename}?
 opacity,Opacity,Opacité,Opacidad
 button-reset-opacities,Reset opacities,Réinitialiser les opacités,Restablecer niveles de opacidad
 preview-size,Preview size,Taille de l'aperçu,Tamaño de vista previa
@@ -715,6 +723,7 @@ failed-fetch-current-stats,Failed to fetch current statistics,Une erreur a eu li
 failed-fetch-total-counts,Failed to fetch the total counts,Une erreur a eu lieu lors du chargement des statistiques,No se pudo obtener el recuento total
 unexpected-error-info-message,An unexpected error occurred,Une erreur inattendue s'est produite,Se ha producido un error inesperado
 error-attached-files,Error fetching attached files,Erreur lors du chargement des fichiers joints,Error al recuperar archivos adjuntos
+error-attached-snapshot,Error fetching attached snapshot,Erreur lors du chargement des fichiers joints,Error al recuperar archivos adjuntos
 error-fetch-properties,Error fetching properties,Erreur lors du chargement des propriétés,Error al recuperar propiedades
 failed-fetch-recent-projects,Failed to fetch recent projects,Erreur lors du chargement des projets récents,Error al buscar proyectos recientes
 error-cannot-upload,Unexpected error prevents upload,Une erreur inattendue empêche les uploads,Un error inesperado impide la carga
@@ -1045,4 +1054,5 @@ notif-error-source-delete,Failed to delete trusted source {username}/{dockerUser
 images-in-projects,Images in projects,Images au sein des projets
 uploaded-images,Images uploaded,Images téléversées
 step,Step,Saut
-screenshot, Screenshot current image view, Capture d'écran de l'image actuelle
+screenshot, Screenshot current image view(download), Capture d'écran de l'image actuelle
+snapshot, Screenshot current image view, Capture d'écran de l'image actuelle

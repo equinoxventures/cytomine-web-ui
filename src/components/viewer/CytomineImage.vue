@@ -72,7 +72,7 @@
 
     </vl-map>
     <div v-if="configUI['project-tools-main']" class="draw-tools">
-      <draw-tools :index="index" @screenshot="takeScreenshot()"/>
+      <draw-tools :index="index" @screenshot="takeScreenshot()" @snapshot="takeSnapshot()"/>
     </div>
 
     <div class="panels">
@@ -214,6 +214,8 @@ import {ImageConsultation, Annotation, AnnotationType, UserPosition, SliceInstan
 import {constLib, operation} from '@/utils/color-manipulation.js';
 
 import constants from '@/utils/constants.js';
+import {AttachedFile} from 'cytomine-client';
+
 
 export default {
   name: 'cytomine-image',
@@ -687,6 +689,35 @@ export default {
 
       // Reset container css values as previous
       document.querySelector('.map-container').style.height = '';
+    },
+    async takeSnapshot() {
+      try {
+        let containerHeight = document.querySelector('.map-container').clientHeight;
+        document.querySelector('.map-container').style.height = containerHeight+'px';
+        const canvas = await this.$html2canvas(document.querySelector('.ol-unselectable'));
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+        let imageName = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`+ '.png';
+        canvas.toBlob(async (blob) => {
+          const file= new File([blob], imageName, { type: 'image/png' });
+          let attachedFile = new AttachedFile({file: file, filename: imageName},this.imageWrapper.imageInstance).save();
+          this.$emit(attachedFile);
+        }, 'image/png');
+        this.$notify({type: 'success', text: this.$t(`Success get snapshot ${imageName}`)});
+      }
+      catch (error){
+        this.$notify({type: 'error', text: this.$t('error: ${error}')});
+
+      }
+
+
+
+
     },
   },
   async created() {
