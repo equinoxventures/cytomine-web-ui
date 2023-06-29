@@ -72,7 +72,7 @@
 
     </vl-map>
     <div v-if="configUI['project-tools-main']" class="draw-tools">
-      <draw-tools :index="index" @screenshot="takeScreenshot()" @snapshot="takeSnapshot()"/>
+      <draw-tools :index="index" @screenshot="takeScreenshot()"/>
     </div>
 
     <div class="panels">
@@ -676,25 +676,12 @@ export default {
       }
     },
     async takeScreenshot() {
-      // Use of css percent values and html2canvas results in strange behavior
-      // Set image container as actual height in pixel (not in percent) to avoid image distortion when retrieving canvas
-      let containerHeight = document.querySelector('.map-container').clientHeight;
-      document.querySelector('.map-container').style.height = containerHeight+'px';
-
-      let a = document.createElement('a');
-      a.href = await this.$html2canvas(document.querySelector('.ol-unselectable'), {type: 'dataURL'});
-      let imageName = 'image_' + this.image.id.toString() + '_project_' + this.image.project.toString() + '.png';
-      a.download = imageName;
-      a.click();
-
-      // Reset container css values as previous
-      document.querySelector('.map-container').style.height = '';
-    },
-    async takeSnapshot() {
       try {
         let containerHeight = document.querySelector('.map-container').clientHeight;
         document.querySelector('.map-container').style.height = containerHeight+'px';
+        let a = document.createElement('a');
         const canvas = await this.$html2canvas(document.querySelector('.ol-unselectable'));
+        a.href = canvas.toDataURL();
         const date = new Date();
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -702,22 +689,22 @@ export default {
         const hours = String(date.getHours()).padStart(2, '0');
         const minutes = String(date.getMinutes()).padStart(2, '0');
         const seconds = String(date.getSeconds()).padStart(2, '0');
-        let imageName = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`+ '.png';
+        let imageName = 'image_' + this.image.id.toString() + '_project_' + this.image.project.toString() +
+          '__' +`${year}-${month}-${day}_${hours}:${minutes}:${seconds}`+'.png';
+        a.download = imageName;
+        a.click();
         canvas.toBlob(async (blob) => {
           const file= new File([blob], imageName, { type: 'image/png' });
           let attachedFile = new AttachedFile({file: file, filename: imageName},this.imageWrapper.imageInstance).save();
           this.$emit(attachedFile);
         }, 'image/png');
+        document.querySelector('.map-container').style.height = '';
         this.$notify({type: 'success', text: this.$t(`Success get snapshot ${imageName}`)});
       }
       catch (error){
-        this.$notify({type: 'error', text: this.$t('error: ${error}')});
+        this.$notify({type: 'error', text: this.$t(`error: ${error}`)});
 
       }
-
-
-
-
     },
   },
   async created() {

@@ -55,7 +55,6 @@ export default Object.freeze({
   'viewer-tool-polygon': ['p'],
   'viewer-tool-freehand-polygon': ['shift', 'p'],
   'viewer-tool-screenshot': ['shift', 's'],
-  'viewer-tool-snapshot': ['alt', 'shift', 's'],
   'viewer-tool-fill': ['f'],
   'viewer-tool-correct-add': ['shift', 'c'],
   'viewer-tool-correct-remove': ['alt', 'shift', 'c'],

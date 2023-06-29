@@ -212,19 +212,7 @@
       class="button"
       @click="takeScreenshot()"
     >
-      <span class="icon is-small"><i class="fas fa-camera"></i></span>
-    </button>
-  </div>
-  <!-- new button -->
-  <div class="buttons has-addons are-small">
-    <button
-      v-if="isToolDisplayed('screenshot')"
-      :disabled="disabledDraw"
-      v-tooltip="$t('snapshot')"
-      class="button"
-      @click="takeSnapshot()"
-    >
-      <span class="icon is-small"><i class="fas fa-camera"></i></span>
+      <span class="icon is-small"><i class="fas fa-image"></i></span>
     </button>
   </div>
 
@@ -893,10 +881,6 @@ export default {
       this.$emit('screenshot');
     },
 
-    takeSnapshot(){
-      this.$emit('snapshot');
-    },
-
     shortkeyHandler(key) {
       if(key !== 'toggle-all-current' && !this.isActiveImage) { // shortkey should only be applied to active map
         return;
@@ -946,15 +930,8 @@ export default {
         case 'tool-screenshot':
           if (this.isToolDisplayed('screenshot') && !this.disabledDraw) {
             this.takeScreenshot();
-            this.takeSnapshot();
           }
           return;
-        // need add snapshot to currentProject,later fix
-        // case 'tool-snapshot':
-        //   if (this.isToolDisplayed('snapshot') && !this.disabledDraw) {
-        //     this.takeSnapshot();
-        //   }
-        //   return;
         case 'tool-delete':
           if (this.isToolDisplayed('delete') && !this.disabledDraw) {
             this.confirmDeletion();
