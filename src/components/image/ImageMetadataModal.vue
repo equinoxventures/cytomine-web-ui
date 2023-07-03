@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import {AbstractImage, PropertyCollection} from 'cytomine-client';
+import {AbstractImage, PropertyCollection} from 'cytomine-client-c';
 import CytomineModal from '@/components/utils/CytomineModal';
 import {getWildcardRegexp} from '@/utils/string-utils';
 

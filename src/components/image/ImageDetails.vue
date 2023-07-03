@@ -76,15 +76,14 @@
           <cytomine-properties :object="image" :canEdit="canEdit" />
         </td>
       </tr>
-      <!-- disable attached-files -->
-<!--      <tr v-if="isPropDisplayed('attached-files')">-->
-<!--        <td class="prop-label">{{$t('attached-files')}}</td>-->
-<!--        <td class="prop-content" colspan="3">-->
-<!--          <attached-files :object="image" :canEdit="canEdit" />-->
-<!--        </td>-->
-<!--      </tr>-->
-      <!-- new attached-files -->
       <tr v-if="isPropDisplayed('attached-files')">
+        <td class="prop-label">{{$t('attached-files')}}</td>
+        <td class="prop-content" colspan="3">
+          <attached-files :object="image" :canEdit="canEdit" />
+        </td>
+      </tr>
+      <!-- new attached-files -->
+      <tr v-if="isPropDisplayed('snapshot-files')">
         <td class="prop-label">{{$t('snapshot-files')}}</td>
         <td class="prop-content" colspan="3">
           <attached-snapshot :object="image" :canEdit="canEdit" />
@@ -293,7 +292,7 @@ import {get} from '@/utils/store-helpers';
 import CytomineDescription from '@/components/description/CytomineDescription';
 import CytomineProperties from '@/components/property/CytomineProperties';
 import CytomineTags from '@/components/tag/CytomineTags';
-// import AttachedFiles from '@/components/attached-file/AttachedFiles';
+import AttachedFiles from '@/components/attached-file/AttachedFiles';
 import AttachedSnapshot from '@/components/attached-file/AttachedSnapshot.vue';
 
 import MagnificationModal from './MagnificationModal';
@@ -304,7 +303,7 @@ import RenameModal from '@/components/utils/RenameModal';
 
 import {formatMinutesSeconds} from '@/utils/slice-utils.js';
 
-import {ImageInstance} from 'cytomine-client';
+import {ImageInstance} from 'cytomine-client-c';
 
 import vendorFromMime from '@/utils/vendor';
 
@@ -315,7 +314,7 @@ export default {
     CytomineDescription,
     CytomineTags,
     CytomineProperties,
-    // AttachedFiles,
+    AttachedFiles,
     MagnificationModal,
     CalibrationModal,
     ImageMetadataModal,

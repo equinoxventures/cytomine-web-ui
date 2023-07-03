@@ -110,7 +110,7 @@
 <script>
 
 import CytomineTable from '@/components/utils/CytomineTable';
-import {UserCollection} from 'cytomine-client';
+import {UserCollection} from 'cytomine-client-c';
 import UserModal from './UserModal';
 import UserDetails from './UserDetails';
 import {rolesMapping} from '@/utils/role-utils';

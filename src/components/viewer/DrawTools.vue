@@ -212,6 +212,17 @@
       class="button"
       @click="takeScreenshot()"
     >
+      <span class="icon is-small"><i class="fas fa-camera"></i></span>
+    </button>
+  </div>
+  <div class="buttons has-addons are-small">
+    <button
+      v-if="isToolDisplayed('screenshot')"
+      :disabled="disabledDraw"
+      v-tooltip="$t('snapshot')"
+      class="button"
+      @click="takeSnapshot()"
+    >
       <span class="icon is-small"><i class="fas fa-image"></i></span>
     </button>
   </div>
@@ -398,7 +409,7 @@ import IconLineFreeHand from '@/components/icons/IconLineFreeHand';
 import WKT from 'ol/format/WKT';
 import {containsExtent} from 'ol/extent';
 
-import {Cytomine, Annotation, AnnotationType} from 'cytomine-client';
+import {Cytomine, Annotation, AnnotationType} from 'cytomine-client-c';
 import {Action, updateTermProperties, updateTrackProperties} from '@/utils/annotation-utils.js';
 
 export default {
@@ -880,6 +891,9 @@ export default {
     takeScreenshot(){
       this.$emit('screenshot');
     },
+    takeSnapshot(){
+      this.$emit('snapshot');
+    },
 
     shortkeyHandler(key) {
       if(key !== 'toggle-all-current' && !this.isActiveImage) { // shortkey should only be applied to active map
@@ -930,6 +944,7 @@ export default {
         case 'tool-screenshot':
           if (this.isToolDisplayed('screenshot') && !this.disabledDraw) {
             this.takeScreenshot();
+            this.takeSnapshot();
           }
           return;
         case 'tool-delete':

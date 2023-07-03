@@ -185,7 +185,7 @@
 import {get} from '@/utils/store-helpers';
 import {changeLanguageMixin} from '@/lang.js';
 import _ from 'lodash';
-import {User} from 'cytomine-client';
+import {User} from 'cytomine-client-c';
 import {rolesMapping} from '@/utils/role-utils';
 import copyToClipboard from 'copy-to-clipboard';
 

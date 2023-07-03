@@ -74,7 +74,7 @@ import {get,syncMultiselectFilter} from '@/utils/store-helpers';
 
 import ImageName from '@/components/image/ImageName';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
-import {ImageInstanceCollection, TagCollection} from 'cytomine-client';
+import {ImageInstanceCollection, TagCollection} from 'cytomine-client-c';
 import {getWildcardRegexp} from '@/utils/string-utils';
 
 const storeOptions = {rootModuleProp: 'storeModule'};

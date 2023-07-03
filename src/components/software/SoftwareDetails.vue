@@ -113,7 +113,7 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
-import {ProjectCollection, TrustedSource} from 'cytomine-client';
+import {ProjectCollection, TrustedSource} from 'cytomine-client-c';
 
 import CytomineDescription from '@/components/description/CytomineDescription';
 import CytomineProperties from '@/components/property/CytomineProperties';

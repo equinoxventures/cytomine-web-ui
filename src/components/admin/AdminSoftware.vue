@@ -70,7 +70,7 @@
 </template>
 
 <script>
-import {TrustedSourceCollection} from 'cytomine-client';
+import {TrustedSourceCollection} from 'cytomine-client-c';
 import TrustedSourceModal from './TrustedSourceModal';
 import {getWildcardRegexp} from '@/utils/string-utils';
 import SoftwareSource from '@/components/software/SoftwareSource';

@@ -97,7 +97,7 @@
 import {get, sync} from '@/utils/store-helpers';
 import {getWildcardRegexp} from '@/utils/string-utils';
 
-import {OntologyCollection} from 'cytomine-client';
+import {OntologyCollection} from 'cytomine-client-c';
 import OntologyDetails from './OntologyDetails';
 import AddOntologyModal from './AddOntologyModal';
 

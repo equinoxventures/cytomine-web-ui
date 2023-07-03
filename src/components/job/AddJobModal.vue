@@ -95,7 +95,7 @@
 <script>
 import {get} from '@/utils/store-helpers';
 
-import {SoftwareCollection, Job, JobParameter} from 'cytomine-client';
+import {SoftwareCollection, Job, JobParameter} from 'cytomine-client-c';
 import CytomineModal from '@/components/utils/CytomineModal';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import JobParameterRow from './JobParameterRow';

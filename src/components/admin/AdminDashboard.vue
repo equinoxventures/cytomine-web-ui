@@ -152,7 +152,7 @@
 </template>
 
 <script>
-import {Cytomine} from 'cytomine-client';
+import {Cytomine} from 'cytomine-client-c';
 import LastConnectionsChart from '@/components/charts/LastConnectionsChart.js';
 import moment from 'moment';
 

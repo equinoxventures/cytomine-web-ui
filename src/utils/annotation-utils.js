@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-import {AnnotationTermCollection, AnnotationType, AnnotationTrackCollection} from 'cytomine-client';
+import {AnnotationTermCollection, AnnotationType, AnnotationTrackCollection} from 'cytomine-client-c';
 
 /** Enum providing the actions that can be performed on annotations */
 export const Action = Object.freeze({

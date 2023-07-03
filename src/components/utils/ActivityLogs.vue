@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import {Project} from 'cytomine-client';
+import {Project} from 'cytomine-client-c';
 import moment from 'moment';
 import _ from 'lodash';
 

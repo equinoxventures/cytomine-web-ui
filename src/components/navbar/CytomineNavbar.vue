@@ -112,7 +112,7 @@ import HotkeysModal from './HotkeysModal';
 import AboutCytomineModal from './AboutCytomineModal';
 import CytomineSearcher from '@/components/search/CytomineSearcher';
 
-import {Cytomine} from 'cytomine-client';
+import {Cytomine} from 'cytomine-client-c';
 import {fullName} from '@/utils/user-utils.js';
 import shortcuts from '@/utils/shortcuts.js';
 

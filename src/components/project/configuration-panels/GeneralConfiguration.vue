@@ -161,7 +161,7 @@ import {get} from '@/utils/store-helpers';
 
 import ProjectActions from '../ProjectActions';
 import DefaultProperty from './DefaultProperty';
-import {Project, ProjectDefaultLayer, ProjectDefaultLayerCollection} from 'cytomine-client';
+import {Project, ProjectDefaultLayer, ProjectDefaultLayerCollection} from 'cytomine-client-c';
 import {fullName} from '@/utils/user-utils.js';
 
 export default {

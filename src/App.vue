@@ -57,7 +57,7 @@ import {changeLanguageMixin} from '@/lang.js';
 import CytomineNavbar from './components/navbar/CytomineNavbar.vue';
 import Login from './components/user/Login.vue';
 
-import {Cytomine} from 'cytomine-client';
+import {Cytomine} from 'cytomine-client-c';
 
 import constants from '@/utils/constants.js';
 import ifvisible from 'ifvisible';

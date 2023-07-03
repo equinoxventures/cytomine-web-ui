@@ -66,7 +66,7 @@
 import SlVueTree from 'sl-vue-tree';
 import CytomineTrack from './CytomineTrack';
 import TrackModal from './TrackModal';
-import {Track} from 'cytomine-client';
+import {Track} from 'cytomine-client-c';
 
 export default {
   name: 'track-tree',

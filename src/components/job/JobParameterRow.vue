@@ -80,7 +80,7 @@
 import {get} from '@/utils/store-helpers';
 import moment from 'moment';
 
-import {Cytomine, Description} from 'cytomine-client';
+import {Cytomine, Description} from 'cytomine-client-c';
 import CytomineMultiselect from '@/components/form/CytomineMultiselect';
 import CytomineTerm from '@/components/ontology/CytomineTerm';
 

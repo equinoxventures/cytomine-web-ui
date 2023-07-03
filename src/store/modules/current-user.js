@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-import {Cytomine, User} from 'cytomine-client';
+import {Cytomine, User} from 'cytomine-client-c';
 
 function getDefaultState() {
   return {

@@ -86,7 +86,7 @@
 </template>
 
 <script>
-import {TagCollection} from 'cytomine-client';
+import {TagCollection} from 'cytomine-client-c';
 import {getWildcardRegexp} from '@/utils/string-utils';
 import TagModal from '@/components/tag/TagModal';
 

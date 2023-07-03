@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import {UploadedFileStatus} from 'cytomine-client';
+import {UploadedFileStatus} from 'cytomine-client-c';
 
 export default {
   name: 'uploaded-file-status',

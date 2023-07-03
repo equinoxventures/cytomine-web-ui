@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-import {TrackCollection} from 'cytomine-client';
+import {TrackCollection} from 'cytomine-client-c';
 
 export default {
   state() {

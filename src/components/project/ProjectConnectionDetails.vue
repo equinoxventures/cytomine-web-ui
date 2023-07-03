@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import {ImageConsultationCollection} from 'cytomine-client';
+import {ImageConsultationCollection} from 'cytomine-client-c';
 import ImagePreview from '@/components/image/ImagePreview';
 
 export default {

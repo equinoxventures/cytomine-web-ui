@@ -72,7 +72,7 @@
 
     </vl-map>
     <div v-if="configUI['project-tools-main']" class="draw-tools">
-      <draw-tools :index="index" @screenshot="takeScreenshot()"/>
+      <draw-tools :index="index" @screenshot="takeScreenshot()" @snapshot="takeSnapshot()"/>
     </div>
 
     <div class="panels">
@@ -209,12 +209,12 @@ import {KeyboardPan, KeyboardZoom} from 'ol/interaction';
 import {noModifierKeys, targetNotEditable} from 'ol/events/condition';
 import WKT from 'ol/format/WKT';
 
-import {ImageConsultation, Annotation, AnnotationType, UserPosition, SliceInstance} from 'cytomine-client';
+import {ImageConsultation, Annotation, AnnotationType, UserPosition, SliceInstance} from 'cytomine-client-c';
 
 import {constLib, operation} from '@/utils/color-manipulation.js';
 
 import constants from '@/utils/constants.js';
-import {AttachedFile} from 'cytomine-client';
+import {SnapshotFile} from 'cytomine-client-c';
 
 
 export default {
@@ -273,6 +273,7 @@ export default {
     routedAction() {
       return this.$route.query.action;
     },
+    project: get('currentProject/project'),
     configUI: get('currentProject/configUI'),
     viewerModule() {
       return this.$store.getters['currentProject/currentViewerModule'];
@@ -676,6 +677,20 @@ export default {
       }
     },
     async takeScreenshot() {
+
+      // Use of css percent values and html2canvas results in strange behavior
+      // Set image container as actual height in pixel (not in percent) to avoid image distortion when retrieving canvas
+      let containerHeight = document.querySelector('.map-container').clientHeight;
+      document.querySelector('.map-container').style.height = containerHeight+'px';
+
+      let a = document.createElement('a');
+      a.href = await this.$html2canvas(document.querySelector('.ol-unselectable'), {type: 'dataURL'});
+      let imageName = 'image_' + this.image.id.toString() + '_project_' + this.image.project.toString() + '.png';
+      a.download = imageName;
+      a.click();
+      document.querySelector('.map-container').style.height = '';
+    },
+    async takeSnapshot() {
       try {
         let containerHeight = document.querySelector('.map-container').clientHeight;
         document.querySelector('.map-container').style.height = containerHeight+'px';
@@ -689,14 +704,14 @@ export default {
         const hours = String(date.getHours()).padStart(2, '0');
         const minutes = String(date.getMinutes()).padStart(2, '0');
         const seconds = String(date.getSeconds()).padStart(2, '0');
-        let imageName = 'image_' + this.image.id.toString() + '_project_' + this.image.project.toString() +
+        let imageName = 'project_' + this.project.name +'_image_' + this.image.filename +
           '__' +`${year}-${month}-${day}_${hours}:${minutes}:${seconds}`+'.png';
         a.download = imageName;
         a.click();
         canvas.toBlob(async (blob) => {
           const file= new File([blob], imageName, { type: 'image/png' });
-          let attachedFile = new AttachedFile({file: file, filename: imageName},this.imageWrapper.imageInstance).save();
-          this.$emit(attachedFile);
+          let snapshotFile = new SnapshotFile({file: file, filename: imageName},this.imageWrapper.imageInstance).save();
+          this.$emit(snapshotFile);
         }, 'image/png');
         document.querySelector('.map-container').style.height = '';
         this.$notify({type: 'success', text: this.$t(`Success get snapshot ${imageName}`)});

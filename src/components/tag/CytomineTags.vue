@@ -43,7 +43,7 @@
 
 <script>
 
-import {Tag, TagDomainAssociation, TagDomainAssociationCollection} from 'cytomine-client';
+import {Tag, TagDomainAssociation, TagDomainAssociationCollection} from 'cytomine-client-c';
 import AddTagDomainAssociationModal from '@/components/tag/AddTagDomainAssociationModal';
 import {get} from '@/utils/store-helpers';
 

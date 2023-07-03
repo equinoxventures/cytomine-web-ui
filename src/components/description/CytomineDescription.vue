@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import {Description} from 'cytomine-client';
+import {Description} from 'cytomine-client-c';
 import DescriptionModal from './CytomineDescriptionModal';
 
 import constants from '@/utils/constants.js';

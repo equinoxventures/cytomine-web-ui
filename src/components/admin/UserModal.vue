@@ -94,7 +94,7 @@
 </template>
 
 <script>
-import {User, RoleCollection} from 'cytomine-client';
+import {User, RoleCollection} from 'cytomine-client-c';
 import {rolesMapping} from '@/utils/role-utils';
 const defaultRole = 'ROLE_GUEST';
 const defaultLanguage = {value: 'EN', name:'English'};
@@ -176,7 +176,7 @@ export default {
     isAdminConfirmed(){
       return this.adminConfirm || !this.isChangingRoleToAdmin();
     },
-    
+
     async save() {
       let result = await this.$validator.validateAll();
       if(!result) {

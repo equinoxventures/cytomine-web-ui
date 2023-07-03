@@ -66,7 +66,7 @@
 import SlVueTree from 'sl-vue-tree';
 import CytomineTerm from './CytomineTerm';
 import TermModal from './TermModal';
-import {Term} from 'cytomine-client';
+import {Term} from 'cytomine-client-c';
 import {getWildcardRegexp} from '@/utils/string-utils';
 
 export default {

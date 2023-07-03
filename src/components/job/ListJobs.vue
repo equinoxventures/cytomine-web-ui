@@ -139,7 +139,7 @@
 <script>
 import {get, sync, syncMultiselectFilter} from '@/utils/store-helpers';
 
-import {JobCollection} from 'cytomine-client';
+import {JobCollection} from 'cytomine-client-c';
 import JobStatus from './JobStatus';
 import JobDetails from './JobDetails';
 import AddJobModal from './AddJobModal';

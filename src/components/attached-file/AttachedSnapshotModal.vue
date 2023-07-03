@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import {AttachedFile} from 'cytomine-client';
+import {SnapshotFile} from 'cytomine-client-c';
 import CytomineModalCard from '@/components/utils/CytomineModalCard.vue';
 
 export default {
@@ -78,7 +78,7 @@ export default {
       }
 
       try {
-        let attached = await new AttachedFile({file: this.selectedFile, filename: this.name}, this.object).save();
+        let attached = await new SnapshotFile({file: this.selectedFile, filename: this.name}, this.object).save();
         this.$emit('addAttachedFile', attached);
         this.$notify({type: 'success', text: this.$t('notif-success-attached-snapshot-creation')});
         this.$parent.close();

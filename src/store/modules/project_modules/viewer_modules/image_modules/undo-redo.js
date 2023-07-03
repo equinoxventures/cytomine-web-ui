@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-import {Cytomine} from 'cytomine-client';
+import {Cytomine} from 'cytomine-client-c';
 
 export default {
   state() {

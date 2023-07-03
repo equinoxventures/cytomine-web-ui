@@ -13,14 +13,14 @@
  limitations under the License.-->
 
 <template>
-<div class="attached-files-wrapper">
+<div class="snapshot-files-wrapper">
   <template v-if="!loading">
     <em v-if="error">{{$t('error-attached-snapshot')}}</em>
-    <template v-else-if="attachedFiles.length > 0">
-      <span class="file-item" v-for="(file, index) in attachedFiles" :key="file.id">
+    <template v-else-if="snapshotFiles.length > 0">
+      <span class="file-item" v-for="(file, index) in snapshotFiles" :key="file.id">
         <a :href="host + file.url">{{file.filename}}</a>
         <button v-if="canEdit" class="delete is-small" @click="confirmDeletion(file, index)"></button>
-        <template v-if="index < attachedFiles.length - 1">,</template>
+        <template v-if="index < snapshotFiles.length - 1">,</template>
       </span>
     </template>
     <em v-else>{{$t('no-attached-snapshot')}} </em>
@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import {Cytomine, AttachedFileCollection} from 'cytomine-client';
+import {Cytomine,SnapshotFileCollection} from 'cytomine-client-c';
 import AttachedSnapshotModal from './AttachedSnapshotModal.vue';
 
 
@@ -44,7 +44,7 @@ export default {
     return {
       loading: true,
       error: false,
-      attachedFiles: []
+      snapshotFiles: []
     };
   },
   computed: {
@@ -63,43 +63,43 @@ export default {
         component: AttachedSnapshotModal,
         props: {object: this.object},
         hasModalCard: true,
-        events: {'addAttachedFile': this.addAttachedFile}
+        events: {'addSnapshotFile': this.addSnapshotFile}
       });
     },
-    addAttachedFile(attachedFile) {
-      this.attachedFiles.push(attachedFile);
+    addSnapshotFile(snapshotFiles) {
+      this.snapshotFiles.push(snapshotFiles);
     },
-    confirmDeletion(attachedFile, idx) {
+    confirmDeletion(snapshotFile, idx) {
       this.$buefy.dialog.confirm({
         title: this.$t('confirm-deletion'),
-        message: this.$t('confirm-deletion-attached-snapshot', {filename: attachedFile.filename}),
+        message: this.$t('confirm-deletion-attached-snapshot', {filename: snapshotFile.filename}),
         type: 'is-danger',
         confirmText: this.$t('button-confirm'),
         cancelText: this.$t('button-cancel'),
-        onConfirm: () => this.deleteAttachedFile(attachedFile, idx)
+        onConfirm: () => this.deleteAttachedFile(snapshotFile, idx)
       });
     },
-    async deleteAttachedFile(attachedFile, idx) {
+    async deleteAttachedFile(snapshotFile, idx) {
       try {
-        await attachedFile.delete();
-        this.attachedFiles.splice(idx, 1);
+        await snapshotFile.delete();
+        this.snapshotFiles.splice(idx, 1);
         this.$notify({
           type: 'success',
-          text: this.$t('notif-success-attached-snapshot-deletion', {filename: attachedFile.filename})
+          text: this.$t('notif-success-attached-snapshot-deletion', {filename: snapshotFile.filename})
         });
       }
       catch(error) {
         console.log(error);
         this.$notify({
           type: 'error',
-          text: this.$t('notif-error-attached-snapshot-deletion', {filename: attachedFile.filename})
+          text: this.$t('notif-error-attached-snapshot-deletion', {filename: snapshotFile.filename})
         });
       }
     }
   },
   async created() {
     try {
-      this.attachedFiles = (await AttachedFileCollection.fetchAll({object: this.object})).array;
+      this.snapshotFiles = (await SnapshotFileCollection.fetchAll({object: this.object})).array;
     }
     catch(error) {
       console.log(error);
@@ -112,7 +112,7 @@ export default {
 </script>
 
 <style scoped>
-.attached-files-wrapper {
+.snapshot-files-wrapper {
   position: relative;
   display: flex;
   align-items: center;

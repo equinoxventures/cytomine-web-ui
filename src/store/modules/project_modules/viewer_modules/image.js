@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-import {ImageInstance, AnnotationType, SliceInstanceCollection, SliceInstance, CompanionFileCollection} from 'cytomine-client';
+import {ImageInstance, AnnotationType, SliceInstanceCollection, SliceInstance, CompanionFileCollection} from 'cytomine-client-c';
 
 import constants from '@/utils/constants';
 import {slicePositionToRank} from '@/utils/slice-utils';

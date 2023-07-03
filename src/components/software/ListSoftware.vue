@@ -186,7 +186,7 @@ import {isBetweenBounds} from '@/utils/bounds';
 import {get, sync, syncFilter, syncBoundsFilter} from '@/utils/store-helpers';
 import {getWildcardRegexp} from '@/utils/string-utils';
 
-import {SoftwareCollection} from 'cytomine-client';
+import {SoftwareCollection} from 'cytomine-client-c';
 
 
 export default {

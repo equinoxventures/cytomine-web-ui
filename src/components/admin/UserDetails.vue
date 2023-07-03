@@ -87,7 +87,7 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
-import {Cytomine, ProjectCollection} from 'cytomine-client';
+import {Cytomine, ProjectCollection} from 'cytomine-client-c';
 
 export default {
   props: {

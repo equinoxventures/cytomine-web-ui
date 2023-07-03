@@ -70,7 +70,7 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
-import {ImageInstanceCollection, ProjectCollection} from 'cytomine-client';
+import {ImageInstanceCollection, ProjectCollection} from 'cytomine-client-c';
 import {getWildcardRegexp} from '@/utils/string-utils';
 
 export default {

@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import {TrustedSource} from 'cytomine-client';
+import {TrustedSource} from 'cytomine-client-c';
 
 import CytomineModal from '@/components/utils/CytomineModal';
 

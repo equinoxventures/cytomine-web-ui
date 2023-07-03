@@ -67,7 +67,7 @@ import {fullName} from '@/utils/user-utils.js';
 
 import AnnotationPreview from './AnnotationPreview';
 
-import {AnnotationCollection} from 'cytomine-client';
+import {AnnotationCollection} from 'cytomine-client-c';
 import constants from '@/utils/constants';
 
 export default {

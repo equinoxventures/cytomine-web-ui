@@ -74,7 +74,7 @@
 <script>
 import {get} from '@/utils/store-helpers';
 
-import {AnnotationComment} from 'cytomine-client';
+import {AnnotationComment} from 'cytomine-client-c';
 import DomainTagInput from '@/components/utils/DomainTagInput';
 
 import CytomineModalCard from '@/components/utils/CytomineModalCard';

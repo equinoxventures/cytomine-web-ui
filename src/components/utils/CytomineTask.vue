@@ -23,7 +23,7 @@
 
 <script>
 import constants from '@/utils/constants.js';
-import {Task} from 'cytomine-client';
+import {Task} from 'cytomine-client-c';
 
 export default {
   name: 'cytomine-task',

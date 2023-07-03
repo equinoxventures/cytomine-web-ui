@@ -133,7 +133,7 @@
 <script>
 import {get} from '@/utils/store-helpers';
 
-import {Software, SoftwareParameterCollection, ProjectCollection} from 'cytomine-client';
+import {Software, SoftwareParameterCollection, ProjectCollection} from 'cytomine-client-c';
 
 import CytomineDescription from '@/components/description/CytomineDescription';
 import SoftwareParameterDetails from '@/components/software/SoftwareParameterDetails';

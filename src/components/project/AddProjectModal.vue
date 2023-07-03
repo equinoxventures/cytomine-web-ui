@@ -64,7 +64,7 @@
 </template>
 
 <script>
-import {Project, Ontology} from 'cytomine-client';
+import {Project, Ontology} from 'cytomine-client-c';
 import CytomineModal from '@/components/utils/CytomineModal';
 
 export default {

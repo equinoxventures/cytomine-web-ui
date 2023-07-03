@@ -303,7 +303,7 @@ import OntologyTreeMultiselect from '@/components/ontology/OntologyTreeMultisele
 
 import ListAnnotationsBy from './ListAnnotationsBy';
 
-import {ImageInstanceCollection, UserCollection, UserJobCollection, AnnotationCollection, TrackCollection, TagCollection, ImageInstance} from 'cytomine-client';
+import {ImageInstanceCollection, UserCollection, UserJobCollection, AnnotationCollection, TrackCollection, TagCollection, ImageInstance} from 'cytomine-client-c';
 
 import {fullName} from '@/utils/user-utils.js';
 import {defaultColors} from '@/utils/style-utils.js';

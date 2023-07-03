@@ -95,7 +95,7 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
-import {Ontology, User, ProjectCollection} from 'cytomine-client';
+import {Ontology, User, ProjectCollection} from 'cytomine-client-c';
 import OntologyTree from './OntologyTree';
 import RenameModal from '@/components/utils/RenameModal';
 import {fullName} from '@/utils/user-utils.js';

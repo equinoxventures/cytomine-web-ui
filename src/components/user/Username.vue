@@ -18,7 +18,7 @@
   {{displayFullName ? fullName : resolvedUser.username}}</span></template>
 
 <script>
-import {User} from 'cytomine-client';
+import {User} from 'cytomine-client-c';
 import {fullName} from '@/utils/user-utils.js';
 
 export default {

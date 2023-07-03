@@ -57,7 +57,7 @@ import {get} from '@/utils/store-helpers';
 
 import Username from '@/components/user/Username';
 
-import {UserPosition} from 'cytomine-client';
+import {UserPosition} from 'cytomine-client-c';
 
 import constants from '@/utils/constants.js';
 

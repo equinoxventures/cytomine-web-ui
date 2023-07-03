@@ -75,7 +75,7 @@
 </template>
 
 <script>
-import {Cytomine} from 'cytomine-client';
+import {Cytomine} from 'cytomine-client-c';
 import constants from '@/utils/constants.js';
 import CytomineModalCard from '@/components/utils/CytomineModalCard';
 

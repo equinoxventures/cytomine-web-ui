@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import {UserJobCollection} from 'cytomine-client';
+import {UserJobCollection} from 'cytomine-client-c';
 
 import {get} from '@/utils/store-helpers';
 import {fullName} from '@/utils/user-utils.js';

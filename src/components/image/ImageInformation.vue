@@ -42,7 +42,7 @@
 import ImageName from './ImageName';
 import ImageDetails from './ImageDetails';
 
-import {ImageInstance} from 'cytomine-client';
+import {ImageInstance} from 'cytomine-client-c';
 import vendorFromMime from '@/utils/vendor';
 
 export default {

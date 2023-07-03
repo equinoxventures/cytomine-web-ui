@@ -217,7 +217,7 @@
 <script>
 import {get} from '@/utils/store-helpers';
 
-import {AnnotationTerm, AnnotationType, AnnotationCommentCollection, AnnotationTrack} from 'cytomine-client';
+import {AnnotationTerm, AnnotationType, AnnotationCommentCollection, AnnotationTrack} from 'cytomine-client-c';
 import copyToClipboard from 'copy-to-clipboard';
 import ImageName from '@/components/image/ImageName';
 import CytomineDescription from '@/components/description/CytomineDescription';

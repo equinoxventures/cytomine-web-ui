@@ -105,7 +105,7 @@ import {get} from '@/utils/store-helpers';
 import Username from '@/components/user/Username';
 import ListUsernames from '@/components/user/ListUsernames';
 import CytomineTask from '@/components/utils/CytomineTask';
-import {User, Task, AnnotationCollection} from 'cytomine-client';
+import {User, Task, AnnotationCollection} from 'cytomine-client-c';
 
 export default {
   name: 'review-panel',

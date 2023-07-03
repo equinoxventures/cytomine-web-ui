@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import {Ontology} from 'cytomine-client';
+import {Ontology} from 'cytomine-client-c';
 import CytomineModal from '@/components/utils/CytomineModal';
 
 export default {

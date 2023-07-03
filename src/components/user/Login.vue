@@ -99,7 +99,7 @@
 <script>
 import {get} from '@/utils/store-helpers';
 import {changeLanguageMixin} from '@/lang.js';
-import {Cytomine} from 'cytomine-client';
+import {Cytomine} from 'cytomine-client-c';
 import Register from './Register';
 
 export default {

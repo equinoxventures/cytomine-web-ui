@@ -64,7 +64,7 @@
 
 <script>
 import {get} from '@/utils/store-helpers';
-import {ImageFilterCollection, ImageFilterProject, ImageFilterProjectCollection} from 'cytomine-client';
+import {ImageFilterCollection, ImageFilterProject, ImageFilterProjectCollection} from 'cytomine-client-c';
 import {getWildcardRegexp} from '@/utils/string-utils';
 
 export default {

@@ -64,7 +64,7 @@
 import VueDraggableResizable from 'vue-draggable-resizable';
 
 import AnnotationDetails from '@/components/annotations/AnnotationDetails';
-import {UserCollection, UserJobCollection} from 'cytomine-client';
+import {UserCollection, UserJobCollection} from 'cytomine-client-c';
 import {fullName} from '@/utils/user-utils.js';
 
 export default {

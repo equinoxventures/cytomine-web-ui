@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import {Cytomine, AttachedFileCollection} from 'cytomine-client';
+import {Cytomine, AttachedFileCollection} from 'cytomine-client-c';
 import AttachedFileModal from './AttachedFileModal';
 
 export default {

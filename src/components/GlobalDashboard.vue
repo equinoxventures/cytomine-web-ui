@@ -135,7 +135,7 @@ import {get} from '@/utils/store-helpers';
 import ListImagesPreview from '@/components/image/ListImagesPreview';
 import ImagePreview from '@/components/image/ImagePreview';
 
-import {ImageInstanceCollection, ProjectCollection, Configuration} from 'cytomine-client';
+import {ImageInstanceCollection, ProjectCollection, Configuration} from 'cytomine-client-c';
 
 import constants from '@/utils/constants.js';
 

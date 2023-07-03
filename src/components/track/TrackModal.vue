@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import {Track} from 'cytomine-client';
+import {Track} from 'cytomine-client-c';
 import {Sketch} from 'vue-color';
 import CytomineModalCard from '@/components/utils/CytomineModalCard';
 
