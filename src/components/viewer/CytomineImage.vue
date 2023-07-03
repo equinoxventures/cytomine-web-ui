@@ -706,8 +706,8 @@ export default {
         const seconds = String(date.getSeconds()).padStart(2, '0');
         let imageName = 'project_' + this.project.name +'_image_' + this.image.filename +
           '__' +`${year}-${month}-${day}_${hours}:${minutes}:${seconds}`+'.png';
-        a.download = imageName;
-        a.click();
+        // a.download = imageName;
+        // a.click();
         canvas.toBlob(async (blob) => {
           const file= new File([blob], imageName, { type: 'image/png' });
           let snapshotFile = new SnapshotFile({file: file, filename: imageName},this.imageWrapper.imageInstance).save();

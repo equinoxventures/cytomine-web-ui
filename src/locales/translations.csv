@@ -1054,5 +1054,5 @@ notif-error-source-delete,Failed to delete trusted source {username}/{dockerUser
 images-in-projects,Images in projects,Images au sein des projets
 uploaded-images,Images uploaded,Images téléversées
 step,Step,Saut
-screenshot, Screenshot current image view(download), Capture d'écran de l'image actuelle
-snapshot, Snapshot current image view, Capture d'écran de l'image actuelle
+screenshot,Download only, Capture d'écran de l'image actuelle
+snapshot,Saved to slide, Capture d'écran de l'image actuelle
