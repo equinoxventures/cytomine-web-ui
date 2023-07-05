@@ -21,7 +21,7 @@
   <!-- show radius and length -->
   <vl-overlay v-if="startPoint[0] > 0 && this.activeTool === 'circle' " :position="circleCenterPosition">
     <div class="overlay">
-      <div class="content">
+      <div class="draw-content">
         <div class="line-text">{{ lineShowLength }}</div>
         <div class="dashed-line" :style="{width: (lineLength/this.image.magnification*this.magnification).toFixed(0) + 'px' }"></div>
       </div>
@@ -31,7 +31,7 @@
   <!-- show line length -->
   <vl-overlay v-if="startPoint[0] > 0 && this.activeTool === 'line' " :position="lineTextPosition">
     <div class="overlay">
-      <div class="content">
+      <div class="draw-content">
         <div class="line-text">{{ lineShowLength }}</div>
       </div>
     </div>
@@ -39,7 +39,7 @@
 
   <vl-overlay v-if="startPoint[0] > 0 && this.activeTool === 'rectangle' " :position="rectangularLengthPosition">
     <div class="overlay">
-      <div class="content">
+      <div class="draw-content">
         <div class="line-text ">{{ rectangularShowLength }}</div>
         <div class="dashed-line" :style="{ width: rectangularLengthPixel + 'px' }"></div>
       </div>
@@ -48,7 +48,7 @@
 
   <vl-overlay v-if="startPoint[0] > 0 && this.activeTool === 'rectangle' " :position="rectangularWidthPosition">
     <div class="overlay">
-      <div class="content">
+      <div class="draw-content">
         <div class="rectangular-width-line-text" :style="{transform: `translate(-50%,${rectangularWidthPixel/2}px)`}">{{ rectangularShowWidth }}</div>
         <div class="rectangular-width-dashed-line" :style="{ height: rectangularWidthPixel + 'px' }"></div>
       </div>
@@ -328,16 +328,12 @@ export default {
         return `${Math.round(length*1000) / 1000} ${this.$t('pixels')}`;
       }
     },
-    computeShowPixel(Length){
-      return Length/this.image.magnification*this.magnification;
-    },
     rotateCoords(coords, theta) {
       let cosTheta = Math.cos(theta);
       let sinTheta = Math.sin(theta);
       return coords.map(([x, y]) => [x*cosTheta + y*sinTheta, -x*sinTheta + y*cosTheta]);
     },
     async drawStart(){
-      this.$notify({type: 'success', text: this.$t('start draw')});
       this.mouseEndDrawn = false;
       this.startPoint=this.mousePosition;
     },
@@ -357,9 +353,7 @@ export default {
     },
 
     async endDraw(drawnFeature) {
-      this.mouseEndDrawn = true;
-      for (const layer of this.activeLayers) {
-        const idx = this.activeLayers.indexOf(layer);
+      this.activeLayers.forEach(async (layer, idx) => {
         let annot = new Annotation({
           location: this.getWktLocation(drawnFeature),
           image: this.image.id,
@@ -382,7 +376,7 @@ export default {
           console.log(err);
           this.$notify({type: 'error', text: this.$t('notif-error-annotation-creation')});
         }
-      }
+      });
     },
 
     async endCorrection(feature) {
@@ -425,6 +419,7 @@ export default {
 
 
 <style>
+
 .dashed-line {
   height: 1px;
   border-top: 1px dashed #333;
@@ -451,7 +446,7 @@ export default {
 .overlay {
   position: relative;
 }
-.content {
+.draw-content {
   position: absolute;
   transform: translate(-50%, -50%);
 }
