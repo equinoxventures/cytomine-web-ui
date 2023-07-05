@@ -67,7 +67,7 @@
       />
 
       <select-interaction v-if="activeSelectInteraction" :index="index" />
-      <draw-interaction v-if="activeDrawInteraction" :index="index" />
+      <draw-interaction v-if="activeDrawInteraction" :index="index" :mousePosition="projectedMousePosition" :zoom="zoom"/>
       <modify-interaction v-if="activeModifyInteraction" :index="index" />
 
     </vl-map>

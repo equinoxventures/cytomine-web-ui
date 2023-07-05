@@ -18,6 +18,47 @@
     <vl-source-vector :ident="drawSourceName" ref="olSourceDrawTarget" />
   </vl-layer-vector>
 
+  <!-- show radius and length -->
+  <vl-overlay v-if="startPoint[0] > 0 && this.activeTool === 'circle' " :position="circleCenterPosition">
+    <div class="overlay">
+      <div class="content">
+        <div class="line-text">{{ lineShowLength }}</div>
+        <div class="dashed-line" :style="{width: (lineLength/this.image.magnification*this.magnification).toFixed(0) + 'px' }"></div>
+      </div>
+    </div>
+  </vl-overlay>
+
+  <!-- show line length -->
+  <vl-overlay v-if="startPoint[0] > 0 && this.activeTool === 'line' " :position="lineTextPosition">
+    <div class="overlay">
+      <div class="content">
+        <div class="line-text">{{ lineShowLength }}</div>
+      </div>
+    </div>
+  </vl-overlay>
+
+  <vl-overlay v-if="startPoint[0] > 0 && this.activeTool === 'rectangle' " :position="rectangularLengthPosition">
+    <div class="overlay">
+      <div class="content">
+        <div class="line-text ">{{ rectangularShowLength }}</div>
+        <div class="dashed-line" :style="{ width: rectangularLengthPixel + 'px' }"></div>
+      </div>
+    </div>
+  </vl-overlay>
+
+  <vl-overlay v-if="startPoint[0] > 0 && this.activeTool === 'rectangle' " :position="rectangularWidthPosition">
+    <div class="overlay">
+      <div class="content">
+        <div class="rectangular-width-line-text" :style="{transform: `translate(-50%,${rectangularWidthPixel/2}px)`}">{{ rectangularShowWidth }}</div>
+        <div class="rectangular-width-dashed-line" :style="{ height: rectangularWidthPixel + 'px' }"></div>
+      </div>
+    </div>
+  </vl-overlay>
+
+
+
+
+
   <vl-interaction-draw
     v-if="nbActiveLayers > 0 || drawCorrection"
     ref="olDrawInteraction"
@@ -27,6 +68,7 @@
     :freehand-condition="undefined"
     :geometry-function="drawGeometryFunction"
     @drawend="drawEndHandler"
+    @drawstart="drawStart"
   />
 </div>
 </template>
@@ -43,14 +85,127 @@ import {Action} from '@/utils/annotation-utils.js';
 export default {
   name: 'draw-interaction',
   props: {
-    index: String
+    index: String,
+    mousePosition: Array,
+    zoom: Number,
   },
   data() {
     return {
-      format: new WKT()
+      format: new WKT(),
+      startPoint: [0,0],
+      mouseNowPosition: Array,
+      mouseEndDrawn: false,
     };
+
   },
   computed: {
+    nowMousePosition(){
+      if(!this.mouseEndDrawn){
+        this.updateMousePosition();
+      }
+      return this.mouseNowPosition;
+    },
+    magnification() {
+      let magnification = Math.pow(2, this.zoom - this.image.zoom) * this.image.magnification;
+      return Math.round(magnification * 100) / 100;
+    },
+    circleCenterPosition(){
+      return [
+        (this.startPoint[0] + this.lineLength/2) ,
+        this.startPoint[1]
+      ];
+    },
+    lineTextPosition() {
+      return [
+        (this.startPoint[0] + this.nowMousePosition[0]) / 2,
+        (this.startPoint[1] + this.nowMousePosition[1]) / 2
+      ];
+    },
+    lineLength(){
+      const deltaX = this.nowMousePosition[0] - this.startPoint[0];
+      const deltaY = this.nowMousePosition[1] - this.startPoint[1];
+      return  Math.sqrt(deltaX * deltaX + deltaY * deltaY).toFixed(2);
+    },
+    lineShowLength() {
+      return this.computeShowLength(this.lineLength);
+    },
+    rectangularLength(){
+      return Math.abs(this.nowMousePosition[0] - this.startPoint[0]) ;
+    },
+    rectangularWidth(){
+      return Math.abs(this.nowMousePosition[1] - this.startPoint[1]) ;
+    },
+    rectangularShowLength(){
+      return this.computeShowLength(this.rectangularLength);
+    },
+    rectangularShowWidth(){
+      return this.computeShowLength(this.rectangularWidth);
+    },
+    rectangularLengthPixel(){
+      return (this.rectangularLength/this.image.magnification*this.magnification).toFixed(0);
+    },
+    rectangularWidthPixel(){
+      return (this.rectangularWidth/this.image.magnification*this.magnification).toFixed(0);
+    },
+    rectangularLengthPosition(){
+      if ((this.nowMousePosition[0] - this.startPoint[0]<0)){
+        if((this.nowMousePosition[1] - this.startPoint[1]<0)){
+          return [
+            (this.startPoint[0] - this.rectangularLength/2) ,
+            (this.startPoint[1] - this.rectangularWidth/4)
+          ];
+        }
+        else {
+          return [
+            (this.startPoint[0] - this.rectangularLength/2) ,
+            (this.startPoint[1] + this.rectangularWidth/4)
+          ];
+        }
+      }
+      else {
+        if((this.nowMousePosition[1] - this.startPoint[1]<0)){
+          return [
+            (this.startPoint[0] + this.rectangularLength/2) ,
+            (this.startPoint[1] - this.rectangularWidth/4)
+          ];
+        }
+        else {
+          return [
+            (this.startPoint[0] + this.rectangularLength/2) ,
+            (this.startPoint[1] + this.rectangularWidth/4)
+          ];
+        }
+      }
+    },
+    rectangularWidthPosition(){
+      if ((this.nowMousePosition[1] - this.startPoint[1]<0)){
+        if(this.nowMousePosition[0] - this.startPoint[0]<0){
+          return [
+            (this.startPoint[0] - this.rectangularLength/4) ,
+            (this.startPoint[1] - this.rectangularWidth/2)
+          ];
+        }
+        else {
+          return [
+            (this.startPoint[0] + this.rectangularLength/4) ,
+            (this.startPoint[1] - this.rectangularWidth/2)
+          ];
+        }
+      }
+      else {
+        if(this.nowMousePosition[0] - this.startPoint[0]<0){
+          return [
+            (this.startPoint[0] - this.rectangularLength/4) ,
+            (this.startPoint[1] + this.rectangularWidth/2)
+          ];
+        }
+      }
+      return [
+        (this.startPoint[0] + this.rectangularLength/4) ,
+        (this.startPoint[1] + this.rectangularWidth/2)
+      ];
+    },
+
     currentUser: get('currentUser/user'),
     imageModule() {
       return this.$store.getters['currentProject/imageModule'](this.index);
@@ -147,19 +302,47 @@ export default {
 
   watch: {
     activeTool() {
+      this.startPoint[0] = 0;
       this.$refs.olDrawInteraction.scheduleRecreate();
-    }
+    },
+
   },
 
   methods: {
+    updateMousePosition(){
+      this.mouseNowPosition = this.mousePosition;
+    },
+    computeShowLength(Length){
+      let resolution = this.image.physicalSizeX ? this.image.physicalSizeX : 1;
+      let length = Length * resolution;
+
+      if(this.image.physicalSizeX) {
+        let unit = this.$t('um');
+        if (length > 1000) {
+          length /= 1000;
+          unit = this.$t('mm');
+        }
+        return `${length.toPrecision(3)} ${unit}`;
+      }
+      else {
+        return `${Math.round(length*1000) / 1000} ${this.$t('pixels')}`;
+      }
+    },
+    computeShowPixel(Length){
+      return Length/this.image.magnification*this.magnification;
+    },
     rotateCoords(coords, theta) {
       let cosTheta = Math.cos(theta);
       let sinTheta = Math.sin(theta);
       return coords.map(([x, y]) => [x*cosTheta + y*sinTheta, -x*sinTheta + y*cosTheta]);
     },
-
+    async drawStart(){
+      this.$notify({type: 'success', text: this.$t('start draw')});
+      this.mouseEndDrawn = false;
+      this.startPoint=this.mousePosition;
+    },
     clearDrawnFeatures() {
-      this.$refs.olSourceDrawTarget.clear(true);
+      this.$refs.olSourceDrawTarget.clear();
     },
 
     async drawEndHandler({feature}) {
@@ -174,7 +357,9 @@ export default {
     },
 
     async endDraw(drawnFeature) {
-      this.activeLayers.forEach(async (layer, idx) => {
+      this.mouseEndDrawn = true;
+      for (const layer of this.activeLayers) {
+        const idx = this.activeLayers.indexOf(layer);
         let annot = new Annotation({
           location: this.getWktLocation(drawnFeature),
           image: this.image.id,
@@ -191,21 +376,19 @@ export default {
           if(idx === this.nbActiveLayers - 1) {
             this.$eventBus.$emit('selectAnnotation', {index: this.index, annot});
           }
-
           this.$store.commit(this.imageModule + 'addAction', {annot, type: Action.CREATE});
         }
         catch(err) {
           console.log(err);
           this.$notify({type: 'error', text: this.$t('notif-error-annotation-creation')});
         }
-      });
+      }
     },
 
     async endCorrection(feature) {
       if(!this.selectedFeature) {
         return;
       }
-
       try {
         let annot = this.selectedFeature.properties.annot;
         let correctedAnnot = await Annotation.correctAnnotations({
@@ -239,3 +422,46 @@ export default {
   }
 };
 </script>
+
+
+<style>
+.dashed-line {
+  height: 1px;
+  border-top: 1px dashed #333;
+  margin-top: 1px;
+  margin-bottom: 1px;
+  position: relative;
+}
+.rectangular-width-dashed-line {
+  width: 1px;
+  border-left: 1px dashed #333;
+  margin-left: 1px;
+  margin-bottom: 1px;
+  position: relative;
+}
+.rectangular-width-line-text {
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 0 4px;
+  white-space: nowrap;
+  left: 50%;
+
+}
+
+.overlay {
+  position: relative;
+}
+.content {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+.line-text {
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 0 4px;
+  white-space: nowrap;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+</style>
