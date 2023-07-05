@@ -353,6 +353,7 @@ export default {
     },
 
     async endDraw(drawnFeature) {
+      this.mouseEndDrawn = true;
       this.activeLayers.forEach(async (layer, idx) => {
         let annot = new Annotation({
           location: this.getWktLocation(drawnFeature),
