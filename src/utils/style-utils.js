@@ -65,6 +65,41 @@ function createStroke(opacity=0.5) {
   return new Stroke({color: colorWithOpacity(color, opacity), width: 2});
 }
 
+export function createColorStyleWithTransparentFill(color, opacity=0.5) {
+  let colorArray = hexToRgb(color);
+  let colorWithOpacity = colorArray.slice();
+  colorWithOpacity[3] = opacity;
+
+  let fill = new Fill({color: colorWithOpacity});
+  let circleColorWithOpacity = colorArray.slice();
+  circleColorWithOpacity[3] = 1;
+
+  let circleStyle = new Circle({
+    radius: 5,
+    fill: new Fill({color: colorArray}),
+    stroke: createStroke(1),
+  });
+  circleStyle.setOpacity(1);
+
+  return new Style({
+    fill,
+    stroke: createStroke(1),
+    image: circleStyle
+  });
+}
+
+export function changeNoTermOpacity(style, opacity) {
+  let stroke = style.getStroke();
+  if(stroke) {
+    stroke.getColor()[3] = 1;
+  }
+  let fill = style.getFill();
+  if(fill) {
+    fill.getColor()[3] = opacity;
+  }
+
+}
+
 export function createColorStyle(color, opacity=0.5) {
   let colorArray = hexToRgb(color);
   let colorWithOpacity = colorArray.slice();
