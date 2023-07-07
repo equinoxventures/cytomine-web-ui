@@ -14,8 +14,15 @@
 * limitations under the License.
 */
 
-import {createColorStyle, createColorLineStyle, changeOpacity, createStrokeStyle, createLineStrokeStyle} from '@/utils/style-utils.js';
-
+import {
+  createColorStyle,
+  createColorLineStyle,
+  changeOpacity,
+  createStrokeStyle,
+  createLineStrokeStyle,
+  createColorStyleWithTransparentFill, changeNoTermOpacity
+} from '@/utils/style-utils.js';
+let initialNoTermsOpacity = 0;
 let initialTermsOpacity = 1;
 let initialTracksOpacity = 1;
 let initialLayersOpacity = 0.5;
@@ -26,8 +33,8 @@ export default {
       terms: null,
 
       displayNoTerm: true,
-      noTermOpacity: initialTermsOpacity,
-      noTermStyle: createColorStyle('#fff', initialLayersOpacity*initialTermsOpacity),
+      noTermOpacity: initialNoTermsOpacity,
+      noTermStyle: createColorStyleWithTransparentFill('#fff', initialLayersOpacity*initialNoTermsOpacity),
 
       defaultStyle: createColorStyle('#fff', initialLayersOpacity),
       multipleTermsStyle: createColorStyle('#fff', initialLayersOpacity),
@@ -70,7 +77,7 @@ export default {
 
     setNoTermOpacity(state, opacity) {
       state.noTermOpacity = opacity;
-      changeOpacity(state.noTermStyle, state.layersOpacity*opacity);
+      changeNoTermOpacity(state.noTermStyle, state.layersOpacity*opacity);
     },
 
     resetTermOpacities(state) {
