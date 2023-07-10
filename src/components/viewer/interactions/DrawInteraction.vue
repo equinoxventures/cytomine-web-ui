@@ -23,7 +23,7 @@
   <vl-overlay v-if="startPoint[0] > 0 && this.activeTool === 'line' " :position="lineTextPosition">
     <div class="overlay">
       <div class="draw-content">
-        <div class="line-text">{{ lineShowLength }}</div>
+        <div class="line-text-new">{{ lineShowLength }}</div>
       </div>
     </div>
   </vl-overlay>
@@ -65,7 +65,7 @@
   <vl-overlay v-if="startPoint[0] > 0 && this.activeTool === 'rectangle' " :position="rectangularWidthPosition">
     <div class="overlay">
       <div class="draw-content">
-        <div class="rectangular-width-line-text" :style="{transform: `translate(-50%,${rectangularWidthPixel/2}px)`}">~{{ rectangularShowWidth }}</div>
+        <div class="rectangular-width-line-text" :style="{transform: `translate(-50%,${rectangularWidthPixel/2}px)`}">{{ rectangularShowWidth }}</div>
         <div class="rectangular-width-dashed-line" :style="{ height: rectangularWidthPixel + 'px' }"></div>
       </div>
     </div>
@@ -491,7 +491,7 @@ export default {
 }
 .rectangular-width-line-text {
   position: absolute;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(255, 255, 255, 0.4);
   padding: 0 4px;
   white-space: nowrap;
   left: 50%;
@@ -507,11 +507,20 @@ export default {
 }
 .line-text {
   position: absolute;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(255, 255, 255, 0.4);
   padding: 0 4px;
   white-space: nowrap;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
+.line-text-new{
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.4);
+  padding: 0 4px;
+  margin-top: -20px;
+  white-space: nowrap;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
 </style>
