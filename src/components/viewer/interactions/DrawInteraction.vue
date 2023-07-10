@@ -28,6 +28,21 @@
     </div>
   </vl-overlay>
 
+  <template v-for="(item, index) in lineItems" >
+    <vl-overlay
+      :key="index"
+      v-if="startPoint[0] > 0 && activeTool === 'line'"
+      :position="item.position"
+    >
+      <div class="overlay">
+        <div class="draw-content">
+          <div class="line-text">{{ item.lineShowLength }}</div>
+        </div>
+      </div>
+    </vl-overlay>
+  </template>
+
+
   <!-- show radius and length -->
   <vl-overlay v-if="startPoint[0] > 0 && this.activeTool === 'circle' " :position="circleCenterPosition">
     <div class="overlay">
@@ -106,7 +121,6 @@ export default {
       if(!this.mouseEndDrawn){
         this.updateMousePosition();
       }
-
       return this.mouseNowPosition;
     },
     magnification() {
@@ -121,13 +135,25 @@ export default {
     },
     lineTextPosition() {
       return [
-        (this.startPoint[0] + this.nowMousePosition[0]) / 2,
-        (this.startPoint[1] + this.nowMousePosition[1]) / 2
+        (this.nowCoordinates[this.nowCoordinates.length - 2 ][0] + this.nowMousePosition[0]) / 2,
+        (this.nowCoordinates[this.nowCoordinates.length - 2 ][1] + this.nowMousePosition[1]) / 2
       ];
     },
+    lineItems(){
+      const items = [];
+      for (let i = 0; i < this.nowCoordinates.length -2 ; i++) {
+        const deltaX = this.nowCoordinates[i+1][0] - this.nowCoordinates[i][0];
+        const deltaY = this.nowCoordinates[i+1][1] - this.nowCoordinates[i][1];
+        items.push({
+          position: [(this.nowCoordinates[i][0] + this.nowCoordinates[i+1][0])/2, (this.nowCoordinates[i][1] + this.nowCoordinates[i+1][1])/2],
+          lineShowLength: this.computeShowLength(Math.sqrt(deltaX * deltaX + deltaY * deltaY).toFixed(2)),
+        });
+      }
+      return items;
+    },
     lineLength(){
-      const deltaX = this.nowMousePosition[0] - this.startPoint[0];
-      const deltaY = this.nowMousePosition[1] - this.startPoint[1];
+      const deltaX = this.nowMousePosition[0] - this.nowCoordinates[this.nowCoordinates.length - 2 ][0];
+      const deltaY = this.nowMousePosition[1] - this.nowCoordinates[this.nowCoordinates.length - 2 ][1];
       return  Math.sqrt(deltaX * deltaX + deltaY * deltaY).toFixed(2);
     },
     lineShowLength() {
@@ -337,7 +363,7 @@ export default {
   methods: {
     updateMousePosition(){
       this.mouseNowPosition = this.mousePosition;
-      this.mouseNowPosition = this.nowCoordinates[1];
+      this.mouseNowPosition = this.nowCoordinates[this.nowCoordinates.length - 1];
       this.startPoint = this.nowCoordinates[0];
     },
     computeShowLength(Length){
