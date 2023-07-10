@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-import {createGeoJsonFmt} from 'vuelayers/lib/ol-ext/format';
+import {createGeoJsonFmt} from 'vuelayers-c/lib/ol-ext/format';
 import {annotBelongsToLayer} from '@/utils/annotation-utils';
 
 export default {

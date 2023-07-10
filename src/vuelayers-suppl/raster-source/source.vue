@@ -17,7 +17,7 @@
  * @module raster-source/source
  */
 import RasterSource from 'ol/source/Raster';
-import tileSource from 'vuelayers/lib/mixin/image-source';
+import tileSource from 'vuelayers-c/lib/mixin/image-source';
 
 const props = {
   sources: {type: Array},
