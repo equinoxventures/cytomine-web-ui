@@ -23,7 +23,7 @@
   <vl-overlay v-if="startPoint[0] > 0 && this.activeTool === 'line' " :position="lineTextPosition">
     <div class="overlay">
       <div class="draw-content">
-        <div class="line-text">~{{ lineShowLength }}</div>
+        <div class="line-text">{{ lineShowLength }}</div>
       </div>
     </div>
   </vl-overlay>
@@ -32,7 +32,7 @@
   <vl-overlay v-if="startPoint[0] > 0 && this.activeTool === 'circle' " :position="circleCenterPosition">
     <div class="overlay">
       <div class="draw-content">
-        <div class="line-text">~{{ lineShowLength }}</div>
+        <div class="line-text">{{ lineShowLength }}</div>
         <div class="dashed-line" :style="{width: (lineLength/this.image.magnification*this.magnification).toFixed(0) + 'px' }"></div>
       </div>
     </div>
@@ -42,7 +42,7 @@
   <vl-overlay v-if="startPoint[0] > 0 && this.activeTool === 'rectangle' " :position="rectangularLengthPosition">
     <div class="overlay">
       <div class="draw-content">
-        <div class="line-text ">~{{ rectangularShowLength }}</div>
+        <div class="line-text ">{{ rectangularShowLength }}</div>
         <div class="dashed-line" :style="{ width: rectangularLengthPixel + 'px' }"></div>
       </div>
     </div>
@@ -80,6 +80,8 @@ import WKT from 'ol/format/WKT';
 
 import {Annotation, AnnotationType} from 'cytomine-client-c';
 import {Action} from '@/utils/annotation-utils.js';
+import LineString from 'ol/geom/LineString';
+import Circle from 'ol/geom/Circle';
 
 export default {
   name: 'draw-interaction',
@@ -92,6 +94,7 @@ export default {
     return {
       format: new WKT(),
       startPoint: [0,0],
+      nowCoordinates:[[0,0],[0,0]],
       mouseNowPosition: Array,
       mouseEndDrawn: false,
     };
@@ -103,6 +106,7 @@ export default {
       if(!this.mouseEndDrawn){
         this.updateMousePosition();
       }
+
       return this.mouseNowPosition;
     },
     magnification() {
@@ -262,28 +266,51 @@ export default {
       return this.activeTool === 'freehand-polygon' || this.activeTool === 'freehand-line' || this.drawCorrection;
     },
     drawGeometryFunction() {
-      if(this.activeTool === 'rectangle') {
-        return (coordinates, geometry) => {
-          let rotatedCoords = this.rotateCoords(coordinates, this.rotation);
+      switch(this.activeTool){
+        case 'rectangle':
+          return (coordinates, geometry) => {
+            this.nowCoordinates = coordinates;
+            let rotatedCoords = this.rotateCoords(coordinates, this.rotation);
+            let [firstCorner, thirdCorner] = rotatedCoords;
+            let secondCorner = [thirdCorner[0], firstCorner[1]];
+            let fourthCorner = [firstCorner[0], thirdCorner[1]];
+            let rotatedBoxCoordinates = [firstCorner, secondCorner, thirdCorner, fourthCorner, firstCorner];
+            let boxCoordinates = [this.rotateCoords(rotatedBoxCoordinates, -this.rotation)];
+            if(geometry) {
+              geometry.setCoordinates(boxCoordinates);
+            }
+            else {
+              geometry = new Polygon(boxCoordinates);
+            }
+            return geometry;
+          };
+        case 'line':
+          return (coordinates, geometry) => {
+            this.nowCoordinates = coordinates;
+            if(geometry) {
 
-          let [firstCorner, thirdCorner] = rotatedCoords;
-          let secondCorner = [thirdCorner[0], firstCorner[1]];
-          let fourthCorner = [firstCorner[0], thirdCorner[1]];
-
-          let rotatedBoxCoordinates = [firstCorner, secondCorner, thirdCorner, fourthCorner, firstCorner];
-          let boxCoordinates = [this.rotateCoords(rotatedBoxCoordinates, -this.rotation)];
-
-          if(geometry) {
-            geometry.setCoordinates(boxCoordinates);
-          }
-          else {
-            geometry = new Polygon(boxCoordinates);
-          }
-          return geometry;
-        };
-      }
-      else {
-        return null;
+              geometry.setCoordinates(coordinates);
+            }
+            else {
+              geometry = new LineString(coordinates);
+            }
+            return geometry;
+          };
+        case 'circle':
+          return (coordinates, geometry) => {
+            this.nowCoordinates = coordinates;
+            if(geometry) {
+              const dx = coordinates[1][0] - coordinates[0][0];
+              const dy = coordinates[1][1] - coordinates[0][1];
+              geometry.setCenterAndRadius(coordinates[0],Math.sqrt(dx * dx + dy * dy));
+            }
+            else {
+              geometry = new Circle(coordinates);
+            }
+            return geometry;
+          };
+        default:
+          return null;
       }
     },
     layers() {
@@ -310,6 +337,8 @@ export default {
   methods: {
     updateMousePosition(){
       this.mouseNowPosition = this.mousePosition;
+      this.mouseNowPosition = this.nowCoordinates[1];
+      this.startPoint = this.nowCoordinates[0];
     },
     computeShowLength(Length){
       let resolution = this.image.physicalSizeX ? this.image.physicalSizeX : 1;
@@ -321,7 +350,7 @@ export default {
           length /= 1000;
           unit = this.$t('mm');
         }
-        return `${length.toPrecision(3)} ${unit}`;
+        return `${length.toFixed(3)} ${unit}`;
       }
       else {
         return `${Math.round(length*1000) / 1000} ${this.$t('pixels')}`;
@@ -333,7 +362,6 @@ export default {
       return coords.map(([x, y]) => [x*cosTheta + y*sinTheta, -x*sinTheta + y*cosTheta]);
     },
     drawStart(){
-      this.$forceUpdate();
       this.startPoint=this.mousePosition;
       this.mouseEndDrawn = false;
     },
