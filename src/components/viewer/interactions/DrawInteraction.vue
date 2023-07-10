@@ -18,44 +18,43 @@
     <vl-source-vector :ident="drawSourceName" ref="olSourceDrawTarget" />
   </vl-layer-vector>
 
-  <!-- show radius and length -->
-  <vl-overlay v-if="startPoint[0] > 0 && this.activeTool === 'circle' " :position="circleCenterPosition">
-    <div class="overlay">
-      <div class="draw-content">
-        <div class="line-text">{{ lineShowLength }}</div>
-        <div class="dashed-line" :style="{width: (lineLength/this.image.magnification*this.magnification).toFixed(0) + 'px' }"></div>
-      </div>
-    </div>
-  </vl-overlay>
 
   <!-- show line length -->
   <vl-overlay v-if="startPoint[0] > 0 && this.activeTool === 'line' " :position="lineTextPosition">
     <div class="overlay">
       <div class="draw-content">
-        <div class="line-text">{{ lineShowLength }}</div>
+        <div class="line-text">~{{ lineShowLength }}</div>
       </div>
     </div>
   </vl-overlay>
 
+  <!-- show radius and length -->
+  <vl-overlay v-if="startPoint[0] > 0 && this.activeTool === 'circle' " :position="circleCenterPosition">
+    <div class="overlay">
+      <div class="draw-content">
+        <div class="line-text">~{{ lineShowLength }}</div>
+        <div class="dashed-line" :style="{width: (lineLength/this.image.magnification*this.magnification).toFixed(0) + 'px' }"></div>
+      </div>
+    </div>
+  </vl-overlay>
+
+  <!-- show rectangular length -->
   <vl-overlay v-if="startPoint[0] > 0 && this.activeTool === 'rectangle' " :position="rectangularLengthPosition">
     <div class="overlay">
       <div class="draw-content">
-        <div class="line-text ">{{ rectangularShowLength }}</div>
+        <div class="line-text ">~{{ rectangularShowLength }}</div>
         <div class="dashed-line" :style="{ width: rectangularLengthPixel + 'px' }"></div>
       </div>
     </div>
   </vl-overlay>
-
   <vl-overlay v-if="startPoint[0] > 0 && this.activeTool === 'rectangle' " :position="rectangularWidthPosition">
     <div class="overlay">
       <div class="draw-content">
-        <div class="rectangular-width-line-text" :style="{transform: `translate(-50%,${rectangularWidthPixel/2}px)`}">{{ rectangularShowWidth }}</div>
+        <div class="rectangular-width-line-text" :style="{transform: `translate(-50%,${rectangularWidthPixel/2}px)`}">~{{ rectangularShowWidth }}</div>
         <div class="rectangular-width-dashed-line" :style="{ height: rectangularWidthPixel + 'px' }"></div>
       </div>
     </div>
   </vl-overlay>
-
-
 
 
 
@@ -99,6 +98,7 @@ export default {
 
   },
   computed: {
+
     nowMousePosition(){
       if(!this.mouseEndDrawn){
         this.updateMousePosition();
@@ -305,7 +305,6 @@ export default {
       this.startPoint[0] = 0;
       this.$refs.olDrawInteraction.scheduleRecreate();
     },
-
   },
 
   methods: {
@@ -333,15 +332,17 @@ export default {
       let sinTheta = Math.sin(theta);
       return coords.map(([x, y]) => [x*cosTheta + y*sinTheta, -x*sinTheta + y*cosTheta]);
     },
-    async drawStart(){
-      this.mouseEndDrawn = false;
+    drawStart(){
+      this.$forceUpdate();
       this.startPoint=this.mousePosition;
+      this.mouseEndDrawn = false;
     },
     clearDrawnFeatures() {
       this.$refs.olSourceDrawTarget.clear();
     },
 
     async drawEndHandler({feature}) {
+      this.mouseEndDrawn = true;
       if(this.drawCorrection) {
         await this.endCorrection(feature);
       }
@@ -353,7 +354,6 @@ export default {
     },
 
     async endDraw(drawnFeature) {
-      this.mouseEndDrawn = true;
       this.activeLayers.forEach(async (layer, idx) => {
         let annot = new Annotation({
           location: this.getWktLocation(drawnFeature),
