@@ -18,7 +18,7 @@
  */
 import ZoomifySource from 'ol/source/Zoomify';
 import {createFromTileUrlFunctions} from 'ol/tileurlfunction';
-import tileSource from 'vuelayers/lib/mixin/tile-source';
+import tileSource from 'vuelayers-c/lib/mixin/tile-source';
 import TileGrid from 'ol/tilegrid/TileGrid';
 import {DEFAULT_TILE_SIZE} from 'ol/tilegrid/common';
 

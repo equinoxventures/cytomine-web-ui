@@ -64,7 +64,7 @@ Vue.use(VueHtml2Canvas);
 import * as vClickOutside from 'v-click-outside-x';
 Vue.use(vClickOutside);
 
-import VueLayers from 'vuelayers';
+import VueLayers from 'vuelayers-c';
 import ZoomifySource from './vuelayers-suppl/zoomify-source';
 import RasterSource from './vuelayers-suppl/raster-source';
 import TranslateInteraction from './vuelayers-suppl/translate-interaction';
