@@ -18,6 +18,61 @@
     <vl-source-vector :ident="drawSourceName" ref="olSourceDrawTarget" />
   </vl-layer-vector>
 
+
+  <!-- show line length -->
+  <vl-overlay v-if="startPoint[0] > 0 && this.activeTool === 'line' " :position="lineTextPosition">
+    <div class="overlay">
+      <div class="draw-content">
+        <div class="line-text-new">{{ lineShowLength }}</div>
+      </div>
+    </div>
+  </vl-overlay>
+
+  <template v-for="(item, index) in lineItems" >
+    <vl-overlay
+      :key="index"
+      v-if="startPoint[0] > 0 && activeTool === 'line'"
+      :position="item.position"
+    >
+      <div class="overlay">
+        <div class="draw-content">
+          <div class="line-text">{{ item.lineShowLength }}</div>
+        </div>
+      </div>
+    </vl-overlay>
+  </template>
+
+
+  <!-- show radius and length -->
+  <vl-overlay v-if="startPoint[0] > 0 && this.activeTool === 'circle' " :position="circleCenterPosition">
+    <div class="overlay">
+      <div class="draw-content">
+        <div class="line-text">{{ lineShowLength }}</div>
+        <div class="dashed-line" :style="{width: (lineLength/this.image.magnification*this.magnification).toFixed(0) + 'px' }"></div>
+      </div>
+    </div>
+  </vl-overlay>
+
+  <!-- show rectangular length -->
+  <vl-overlay v-if="startPoint[0] > 0 && this.activeTool === 'rectangle' " :position="rectangularLengthPosition">
+    <div class="overlay">
+      <div class="draw-content">
+        <div class="line-text ">{{ rectangularShowLength }}</div>
+        <div class="dashed-line" :style="{ width: rectangularLengthPixel + 'px' }"></div>
+      </div>
+    </div>
+  </vl-overlay>
+  <vl-overlay v-if="startPoint[0] > 0 && this.activeTool === 'rectangle' " :position="rectangularWidthPosition">
+    <div class="overlay">
+      <div class="draw-content">
+        <div class="rectangular-width-line-text" :style="{transform: `translate(-50%,${rectangularWidthPixel/2}px)`}">{{ rectangularShowWidth }}</div>
+        <div class="rectangular-width-dashed-line" :style="{ height: rectangularWidthPixel + 'px' }"></div>
+      </div>
+    </div>
+  </vl-overlay>
+
+
+
   <vl-interaction-draw
     v-if="nbActiveLayers > 0 || drawCorrection"
     ref="olDrawInteraction"
@@ -27,6 +82,7 @@
     :freehand-condition="undefined"
     :geometry-function="drawGeometryFunction"
     @drawend="drawEndHandler"
+    @drawstart="drawStart"
   />
 </div>
 </template>
@@ -39,18 +95,147 @@ import WKT from 'ol/format/WKT';
 
 import {Annotation, AnnotationType} from 'cytomine-client-c';
 import {Action} from '@/utils/annotation-utils.js';
+import LineString from 'ol/geom/LineString';
+import Circle from 'ol/geom/Circle';
 
 export default {
   name: 'draw-interaction',
   props: {
-    index: String
+    index: String,
+    mousePosition: Array,
+    zoom: Number,
   },
   data() {
     return {
-      format: new WKT()
+      format: new WKT(),
+      startPoint: [0,0],
+      nowCoordinates:[[0,0],[0,0]],
+      mouseNowPosition: Array,
+      mouseEndDrawn: false,
     };
+
   },
   computed: {
+
+    nowMousePosition(){
+      if(!this.mouseEndDrawn){
+        this.updateMousePosition();
+      }
+      return this.mouseNowPosition;
+    },
+    magnification() {
+      let magnification = Math.pow(2, this.zoom - this.image.zoom) * this.image.magnification;
+      return Math.round(magnification * 100) / 100;
+    },
+    circleCenterPosition(){
+      return [
+        (this.startPoint[0] + this.lineLength/2) ,
+        this.startPoint[1]
+      ];
+    },
+    lineTextPosition() {
+      return [
+        (this.nowCoordinates[this.nowCoordinates.length - 2 ][0] + this.nowMousePosition[0]) / 2,
+        (this.nowCoordinates[this.nowCoordinates.length - 2 ][1] + this.nowMousePosition[1]) / 2
+      ];
+    },
+    lineItems(){
+      const items = [];
+      for (let i = 0; i < this.nowCoordinates.length -2 ; i++) {
+        const deltaX = this.nowCoordinates[i+1][0] - this.nowCoordinates[i][0];
+        const deltaY = this.nowCoordinates[i+1][1] - this.nowCoordinates[i][1];
+        items.push({
+          position: [(this.nowCoordinates[i][0] + this.nowCoordinates[i+1][0])/2, (this.nowCoordinates[i][1] + this.nowCoordinates[i+1][1])/2],
+          lineShowLength: this.computeShowLength(Math.sqrt(deltaX * deltaX + deltaY * deltaY).toFixed(2)),
+        });
+      }
+      return items;
+    },
+    lineLength(){
+      const deltaX = this.nowMousePosition[0] - this.nowCoordinates[this.nowCoordinates.length - 2 ][0];
+      const deltaY = this.nowMousePosition[1] - this.nowCoordinates[this.nowCoordinates.length - 2 ][1];
+      return  Math.sqrt(deltaX * deltaX + deltaY * deltaY).toFixed(2);
+    },
+    lineShowLength() {
+      return this.computeShowLength(this.lineLength);
+    },
+    rectangularLength(){
+      return Math.abs(this.nowMousePosition[0] - this.startPoint[0]) ;
+    },
+    rectangularWidth(){
+      return Math.abs(this.nowMousePosition[1] - this.startPoint[1]) ;
+    },
+    rectangularShowLength(){
+      return this.computeShowLength(this.rectangularLength);
+    },
+    rectangularShowWidth(){
+      return this.computeShowLength(this.rectangularWidth);
+    },
+    rectangularLengthPixel(){
+      return (this.rectangularLength/this.image.magnification*this.magnification).toFixed(0);
+    },
+    rectangularWidthPixel(){
+      return (this.rectangularWidth/this.image.magnification*this.magnification).toFixed(0);
+    },
+    rectangularLengthPosition(){
+      if ((this.nowMousePosition[0] - this.startPoint[0]<0)){
+        if((this.nowMousePosition[1] - this.startPoint[1]<0)){
+          return [
+            (this.startPoint[0] - this.rectangularLength/2) ,
+            (this.startPoint[1] - this.rectangularWidth/4)
+          ];
+        }
+        else {
+          return [
+            (this.startPoint[0] - this.rectangularLength/2) ,
+            (this.startPoint[1] + this.rectangularWidth/4)
+          ];
+        }
+      }
+      else {
+        if((this.nowMousePosition[1] - this.startPoint[1]<0)){
+          return [
+            (this.startPoint[0] + this.rectangularLength/2) ,
+            (this.startPoint[1] - this.rectangularWidth/4)
+          ];
+        }
+        else {
+          return [
+            (this.startPoint[0] + this.rectangularLength/2) ,
+            (this.startPoint[1] + this.rectangularWidth/4)
+          ];
+        }
+      }
+    },
+    rectangularWidthPosition(){
+      if ((this.nowMousePosition[1] - this.startPoint[1]<0)){
+        if(this.nowMousePosition[0] - this.startPoint[0]<0){
+          return [
+            (this.startPoint[0] - this.rectangularLength/4) ,
+            (this.startPoint[1] - this.rectangularWidth/2)
+          ];
+        }
+        else {
+          return [
+            (this.startPoint[0] + this.rectangularLength/4) ,
+            (this.startPoint[1] - this.rectangularWidth/2)
+          ];
+        }
+      }
+      else {
+        if(this.nowMousePosition[0] - this.startPoint[0]<0){
+          return [
+            (this.startPoint[0] - this.rectangularLength/4) ,
+            (this.startPoint[1] + this.rectangularWidth/2)
+          ];
+        }
+      }
+      return [
+        (this.startPoint[0] + this.rectangularLength/4) ,
+        (this.startPoint[1] + this.rectangularWidth/2)
+      ];
+    },
+
     currentUser: get('currentUser/user'),
     imageModule() {
       return this.$store.getters['currentProject/imageModule'](this.index);
@@ -107,28 +292,51 @@ export default {
       return this.activeTool === 'freehand-polygon' || this.activeTool === 'freehand-line' || this.drawCorrection;
     },
     drawGeometryFunction() {
-      if(this.activeTool === 'rectangle') {
-        return (coordinates, geometry) => {
-          let rotatedCoords = this.rotateCoords(coordinates, this.rotation);
+      switch(this.activeTool){
+        case 'rectangle':
+          return (coordinates, geometry) => {
+            this.nowCoordinates = coordinates;
+            let rotatedCoords = this.rotateCoords(coordinates, this.rotation);
+            let [firstCorner, thirdCorner] = rotatedCoords;
+            let secondCorner = [thirdCorner[0], firstCorner[1]];
+            let fourthCorner = [firstCorner[0], thirdCorner[1]];
+            let rotatedBoxCoordinates = [firstCorner, secondCorner, thirdCorner, fourthCorner, firstCorner];
+            let boxCoordinates = [this.rotateCoords(rotatedBoxCoordinates, -this.rotation)];
+            if(geometry) {
+              geometry.setCoordinates(boxCoordinates);
+            }
+            else {
+              geometry = new Polygon(boxCoordinates);
+            }
+            return geometry;
+          };
+        case 'line':
+          return (coordinates, geometry) => {
+            this.nowCoordinates = coordinates;
+            if(geometry) {
 
-          let [firstCorner, thirdCorner] = rotatedCoords;
-          let secondCorner = [thirdCorner[0], firstCorner[1]];
-          let fourthCorner = [firstCorner[0], thirdCorner[1]];
-
-          let rotatedBoxCoordinates = [firstCorner, secondCorner, thirdCorner, fourthCorner, firstCorner];
-          let boxCoordinates = [this.rotateCoords(rotatedBoxCoordinates, -this.rotation)];
-
-          if(geometry) {
-            geometry.setCoordinates(boxCoordinates);
-          }
-          else {
-            geometry = new Polygon(boxCoordinates);
-          }
-          return geometry;
-        };
-      }
-      else {
-        return null;
+              geometry.setCoordinates(coordinates);
+            }
+            else {
+              geometry = new LineString(coordinates);
+            }
+            return geometry;
+          };
+        case 'circle':
+          return (coordinates, geometry) => {
+            this.nowCoordinates = coordinates;
+            if(geometry) {
+              const dx = coordinates[1][0] - coordinates[0][0];
+              const dy = coordinates[1][1] - coordinates[0][1];
+              geometry.setCenterAndRadius(coordinates[0],Math.sqrt(dx * dx + dy * dy));
+            }
+            else {
+              geometry = new Circle(coordinates);
+            }
+            return geometry;
+          };
+        default:
+          return null;
       }
     },
     layers() {
@@ -147,22 +355,48 @@ export default {
 
   watch: {
     activeTool() {
+      this.startPoint[0] = 0;
       this.$refs.olDrawInteraction.scheduleRecreate();
-    }
+    },
   },
 
   methods: {
+    updateMousePosition(){
+      this.mouseNowPosition = this.mousePosition;
+      this.mouseNowPosition = this.nowCoordinates[this.nowCoordinates.length - 1];
+      this.startPoint = this.nowCoordinates[0];
+    },
+    computeShowLength(Length){
+      let resolution = this.image.physicalSizeX ? this.image.physicalSizeX : 1;
+      let length = Length * resolution;
+
+      if(this.image.physicalSizeX) {
+        let unit = this.$t('um');
+        if (length > 1000) {
+          length /= 1000;
+          unit = this.$t('mm');
+        }
+        return `${length.toFixed(3)} ${unit}`;
+      }
+      else {
+        return `${Math.round(length*1000) / 1000} ${this.$t('pixels')}`;
+      }
+    },
     rotateCoords(coords, theta) {
       let cosTheta = Math.cos(theta);
       let sinTheta = Math.sin(theta);
       return coords.map(([x, y]) => [x*cosTheta + y*sinTheta, -x*sinTheta + y*cosTheta]);
     },
-
+    drawStart(){
+      this.startPoint=this.mousePosition;
+      this.mouseEndDrawn = false;
+    },
     clearDrawnFeatures() {
-      this.$refs.olSourceDrawTarget.clear(true);
+      this.$refs.olSourceDrawTarget.clear();
     },
 
     async drawEndHandler({feature}) {
+      this.mouseEndDrawn = true;
       if(this.drawCorrection) {
         await this.endCorrection(feature);
       }
@@ -191,7 +425,6 @@ export default {
           if(idx === this.nbActiveLayers - 1) {
             this.$eventBus.$emit('selectAnnotation', {index: this.index, annot});
           }
-
           this.$store.commit(this.imageModule + 'addAction', {annot, type: Action.CREATE});
         }
         catch(err) {
@@ -205,7 +438,6 @@ export default {
       if(!this.selectedFeature) {
         return;
       }
-
       try {
         let annot = this.selectedFeature.properties.annot;
         let correctedAnnot = await Annotation.correctAnnotations({
@@ -239,3 +471,56 @@ export default {
   }
 };
 </script>
+
+
+<style>
+
+.dashed-line {
+  height: 1px;
+  border-top: 1px dashed #333;
+  margin-top: 1px;
+  margin-bottom: 1px;
+  position: relative;
+}
+.rectangular-width-dashed-line {
+  width: 1px;
+  border-left: 1px dashed #333;
+  margin-left: 1px;
+  margin-bottom: 1px;
+  position: relative;
+}
+.rectangular-width-line-text {
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.4);
+  padding: 0 4px;
+  white-space: nowrap;
+  left: 50%;
+
+}
+
+.overlay {
+  position: relative;
+}
+.draw-content {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+.line-text {
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.4);
+  padding: 0 4px;
+  white-space: nowrap;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.line-text-new{
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.4);
+  padding: 0 4px;
+  margin-top: -20px;
+  white-space: nowrap;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+</style>

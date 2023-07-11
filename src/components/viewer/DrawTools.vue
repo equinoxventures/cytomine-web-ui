@@ -584,7 +584,6 @@ export default {
   },
   methods: {
     isToolDisplayed(tool) {
-      console.log(this.configUI);
       return this.configUI[`project-tools-${tool}`];
 
     },
