@@ -13,7 +13,7 @@
  limitations under the License.-->
 
 <template>
-<div class="admin-dashboard-wrapper">
+<div class="admin-dashboard-wrapper" >
   <b-loading :is-full-page="false" :active="loading" />
   <template v-if="!loading">
     <h2>{{$t('currently')}}</h2>
