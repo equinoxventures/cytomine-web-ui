@@ -15,13 +15,24 @@
 
 <template>
 <div>
-  <h2>{{$t('welcome-message')}}</h2>
-  <cytomine-quill-editor v-model="welcomeConfig.value" />
-  <p class="has-text-right">
-    <button class="button is-link" @click="save">{{$t('button-save')}}</button>
-  </p>
+  <div class="box">
+    <h2>{{$t('welcome-message')}}</h2>
+    <cytomine-quill-editor v-model="welcomeConfig.value" />
+    <p class="has-text-right">
+      <button class="button is-link" @click="save">{{$t('button-save')}}</button>
+    </p>
+  </div>
+  <div class="box">
+    <h2>{{'webhook'}}</h2>
+    <h3>
+      {{'Snapshot Webhook URL:'}}
+      <input type="text" v-model="WebhookConfig.value" class="url-input">
+      <button class="button is-new-link" @click="saveUrl">{{$t('button-save')}}</button>
+    </h3>
+  </div>
 </div>
 </template>
+
 
 <script>
 import CytomineQuillEditor from '@/components/form/CytomineQuillEditor';
@@ -33,7 +44,8 @@ export default {
   components: {CytomineQuillEditor},
   data() {
     return {
-      welcomeConfig: new Configuration({key: constants.CONFIG_KEY_WELCOME, value: '', readingRole: 'all'})
+      welcomeConfig: new Configuration({key: constants.CONFIG_KEY_WELCOME, value: '', readingRole: 'all'}),
+      WebhookConfig: new Configuration({key: constants.CONFIG_KEY_WEBHOOK, value: '', readingRole: 'all'})
     };
   },
   methods: {
@@ -51,6 +63,21 @@ export default {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-welcome-message-update')});
       }
+    },
+    async saveUrl() {
+      try {
+        if(!this.WebhookConfig.value) {
+          await this.WebhookConfig.delete();
+        }
+        else {
+          await this.WebhookConfig.save();
+        }
+        this.$notify({type: 'success', text: this.$t('Webhook URL message successfully updated\n')});
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: this.$t('Failed to update the Webhook URL message')});
+      }
     }
   },
   async created() {
@@ -59,6 +86,12 @@ export default {
     }
     catch(error) {
       // no welcome message currently set
+    }
+    try {
+      await this.WebhookConfig.fetch();
+    }
+    catch(error) {
+      // no webhook message currently set
     }
   }
 };
@@ -70,7 +103,25 @@ export default {
   max-height: 25em !important;
 }
 
-.button {
+.button.is-link {
   margin-top: 1em;
 }
+.button.is-new-link {
+  @extend .button.is-link;
+  background-color: #3273dc;
+  border-color: transparent;
+  color: #fff;
+  float: right;
+}
+
+
+.url-input {
+  margin-left: 1em;
+  flex: 1;
+  width: 87%;
+  padding: 0.5em;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
 </style>

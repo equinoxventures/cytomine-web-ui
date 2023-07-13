@@ -40,7 +40,7 @@
     </b-radio-button>
   </b-field>
 
-  <div class="box">
+  <div :class="this.computedClass">
     <keep-alive>
       <component :is="activeComponent" />
     </keep-alive>
@@ -92,8 +92,12 @@ export default {
         case 'tags':
           return AdminTags;
       }
-    }
+    },
+    computedClass() {
+      return this.activeTab === 'configuration' ? '' : 'box';
+    },
   },
+
   watch: {
     queriedTab() {
       this.changeTab();

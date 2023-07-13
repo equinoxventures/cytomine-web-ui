@@ -72,7 +72,7 @@
 
     </vl-map>
     <div v-if="configUI['project-tools-main']" class="draw-tools">
-      <draw-tools :index="index" @screenshot="takeScreenshot()" @snapshot="takeSnapshot()"/>
+      <draw-tools :index="index" @screenshot="takeScreenshot()" @snapshot="takeSnapshot()" />
     </div>
 
     <div class="panels">
@@ -214,7 +214,8 @@ import {ImageConsultation, Annotation, AnnotationType, UserPosition, SliceInstan
 import {constLib, operation} from '@/utils/color-manipulation.js';
 
 import constants from '@/utils/constants.js';
-import {SnapshotFile} from 'cytomine-client-c';
+import {SnapshotFile,Configuration,SnapshotFileCollection,Cytomine} from 'cytomine-client-c';
+import axios from 'axios';
 
 
 export default {
@@ -264,6 +265,8 @@ export default {
       overview: null,
 
       format: new WKT(),
+      WebhookConfig: new Configuration({key: constants.CONFIG_KEY_WEBHOOK, value: '', readingRole: 'all'}),
+      snapshotFiles: [],
     };
   },
   computed: {
@@ -272,6 +275,9 @@ export default {
     },
     routedAction() {
       return this.$route.query.action;
+    },
+    host() {
+      return Cytomine.instance.host;
     },
     project: get('currentProject/project'),
     configUI: get('currentProject/configUI'),
@@ -676,6 +682,7 @@ export default {
           return;
       }
     },
+
     async takeScreenshot() {
 
       // Use of css percent values and html2canvas results in strange behavior
@@ -692,11 +699,6 @@ export default {
     },
     async takeSnapshot() {
       try {
-        let containerHeight = document.querySelector('.map-container').clientHeight;
-        document.querySelector('.map-container').style.height = containerHeight+'px';
-        let a = document.createElement('a');
-        const canvas = await this.$html2canvas(document.querySelector('.ol-unselectable'));
-        a.href = canvas.toDataURL();
         const date = new Date();
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -706,20 +708,78 @@ export default {
         const seconds = String(date.getSeconds()).padStart(2, '0');
         let imageName = 'project_' + this.project.name +'_image_' + this.image.filename +
           '__' +`${year}-${month}-${day}_${hours}:${minutes}:${seconds}`+'.png';
-        // a.download = imageName;
-        // a.click();
+        let containerHeight = document.querySelector('.map-container').clientHeight;
+        document.querySelector('.map-container').style.height = containerHeight+'px';
+        const canvas = await this.$html2canvas(document.querySelector('.ol-unselectable'));
         canvas.toBlob(async (blob) => {
           const file= new File([blob], imageName, { type: 'image/png' });
           let snapshotFile = new SnapshotFile({file: file, filename: imageName},this.imageWrapper.imageInstance).save();
-          this.$emit(snapshotFile);
+          await this.$emit(snapshotFile);
         }, 'image/png');
         document.querySelector('.map-container').style.height = '';
         this.$notify({type: 'success', text: this.$t(`Success get snapshot ${imageName}`)});
+        await this.webhookSnapshot(imageName,canvas);
       }
       catch (error){
         this.$notify({type: 'error', text: this.$t(`error: ${error}`)});
-
       }
+    },
+    async webhookSnapshot(imageName,canvas){
+      let webhookUrl = this.WebhookConfig.value;
+      if(webhookUrl.length===0){
+        return;
+      }
+      await new Promise((resolve) => {
+        setTimeout(resolve, 500);
+      }).then(result =>{
+        console.log(result);
+      }).catch(error=>{
+        console.log(error);
+      });
+      let snapshotID;
+      let snapshotURL;
+      this.snapshotFiles = (await SnapshotFileCollection.fetchAll({object: this.image})).array;
+      for (let i = 0; i < this.snapshotFiles.length; i++) {
+        let file = this.snapshotFiles[i];
+        if (file.filename === imageName) {
+          snapshotID = file.id;
+          snapshotURL = this.host + file.url;
+        }
+      }
+      const urls = webhookUrl.split(';');
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      const data = {
+        project: {
+          id: this.image.project.toString(),
+          name: this.project.name
+        },
+        image: {
+          id: this.image.id.toString(),
+          name: this.image.filename
+        },
+        snapshot: {
+          id: snapshotID,
+          URL: snapshotURL,
+          pxLeft: canvas.height.toString()+'px',
+          pxTop: canvas.width.toString()+'px',
+        },
+      };
+      for (let i = 0; i < urls.length; i++) {
+        let url = urls[i];
+        if (!/^(http|https):\/\//.test(url)) {
+          url = 'http://' + url;
+        }
+        try {
+          const response = await axios.post(url, data, {headers});
+          this.$notify({type: 'success', text: response.data});
+        }
+        catch (error) {
+          this.$notify({type: 'error', text: 'Failed: ' + url + ' ' + error});
+        }
+      }
+
     },
   },
   async created() {
@@ -784,7 +844,12 @@ export default {
         this.$notify({type: 'error', text: this.$t('notif-error-target-annotation')});
       }
     }
-
+    try {
+      await this.WebhookConfig.fetch();
+    }
+    catch(error) {
+      // no webhook message currently set
+    }
     try {
       await new ImageConsultation({image: this.image.id}).save();
     }
