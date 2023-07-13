@@ -118,7 +118,7 @@ export default {
 .url-input {
   margin-left: 1em;
   flex: 1;
-  width: 87%;
+  width: 85%;
   padding: 0.5em;
   border: 1px solid #ccc;
   border-radius: 4px;
