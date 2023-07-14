@@ -93,10 +93,11 @@ import {get} from '@/utils/store-helpers';
 import Polygon, {fromCircle as polygonFromCircle} from 'ol/geom/Polygon';
 import WKT from 'ol/format/WKT';
 
-import {Annotation, AnnotationType} from 'cytomine-client-c';
+import {Annotation, AnnotationType,Configuration} from 'cytomine-client-c';
 import {Action} from '@/utils/annotation-utils.js';
 import LineString from 'ol/geom/LineString';
 import Circle from 'ol/geom/Circle';
+import constants from '@/utils/constants';
 
 export default {
   name: 'draw-interaction',
@@ -112,6 +113,7 @@ export default {
       nowCoordinates:[[0,0],[0,0]],
       mouseNowPosition: Array,
       mouseEndDrawn: false,
+      MillimeterConfig: new Configuration({key: constants.CONFIG_KEY_MILLIMETER, value: '', readingRole: 'all'}),
     };
 
   },
@@ -369,10 +371,9 @@ export default {
     computeShowLength(Length){
       let resolution = this.image.physicalSizeX ? this.image.physicalSizeX : 1;
       let length = Length * resolution;
-
       if(this.image.physicalSizeX) {
         let unit = this.$t('um');
-        if (length > 1000) {
+        if (this.MillimeterConfig.value || length > 1000) {
           length /= 1000;
           unit = this.$t('mm');
         }
@@ -468,6 +469,14 @@ export default {
       }
       return this.format.writeFeature(feature);
     },
+  },
+  async created() {
+    try {
+      await this.MillimeterConfig.fetch();
+    }
+    catch(error) {
+      // no set
+    }
   }
 };
 </script>

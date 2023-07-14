@@ -31,6 +31,9 @@
 </template>
 
 <script>
+import constants from '@/utils/constants';
+import {Configuration} from 'cytomine-client-c';
+
 export default {
   name: 'scale-line',
   props: {
@@ -40,7 +43,8 @@ export default {
   },
   data() {
     return {
-      scaleLineLength: 100
+      scaleLineLength: 100,
+      MillimeterConfig: new Configuration({key: constants.CONFIG_KEY_MILLIMETER, value: '', readingRole: 'all'}),
     };
   },
   computed: {
@@ -56,7 +60,7 @@ export default {
       let length = this.scaleLineLength * this.resolution;
       if(this.image.physicalSizeX) {
         let unit = this.$t('um');
-        if (length > 1000) {
+        if (this.MillimeterConfig.value || length > 1000) {
           length /= 1000;
           unit = this.$t('mm');
         }
@@ -68,6 +72,14 @@ export default {
     },
     interpolation() {
       return this.zoom > this.image.zoom;
+    }
+  },
+  async created() {
+    try {
+      await this.MillimeterConfig.fetch();
+    }
+    catch(error) {
+      // no set
     }
   }
 };

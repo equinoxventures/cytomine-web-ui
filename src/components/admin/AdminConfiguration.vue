@@ -30,6 +30,17 @@
       <button class="button is-new-link" @click="saveUrl">{{$t('button-save')}}</button>
     </h3>
   </div>
+  <div class="box">
+    <h2>{{'Aesthetics'}}</h2>
+    <h3>
+      {{'Default is to transition to µm when less than 1mm:'}}
+      <button
+        :class="['button millimeter', MillimeterConfig.value ? 'is-success' : 'is-danger']"
+        @click="ShowMillimeter"
+      >
+        {{ MillimeterConfig.value ? $t('enable') : $t('disable') }}      </button>
+    </h3>
+  </div>
 </div>
 </template>
 
@@ -45,7 +56,8 @@ export default {
   data() {
     return {
       welcomeConfig: new Configuration({key: constants.CONFIG_KEY_WELCOME, value: '', readingRole: 'all'}),
-      WebhookConfig: new Configuration({key: constants.CONFIG_KEY_WEBHOOK, value: '', readingRole: 'all'})
+      WebhookConfig: new Configuration({key: constants.CONFIG_KEY_WEBHOOK, value: '', readingRole: 'all'}),
+      MillimeterConfig: new Configuration({key: constants.CONFIG_KEY_MILLIMETER, value: '', readingRole: 'all'}),
     };
   },
   methods: {
@@ -72,11 +84,28 @@ export default {
         else {
           await this.WebhookConfig.save();
         }
-        this.$notify({type: 'success', text: this.$t('Webhook URL message successfully updated\n')});
+        this.$notify({type: 'success', text: 'Webhook URL message successfully updated\n'});
       }
       catch(error) {
         console.log(error);
-        this.$notify({type: 'error', text: this.$t('Failed to update the Webhook URL message')});
+        this.$notify({type: 'error', text: 'Failed to update the Webhook URL message'});
+      }
+    },
+    async ShowMillimeter() {
+      try {
+        if(this.MillimeterConfig.value) {
+          this.MillimeterConfig.value = '';
+          await this.MillimeterConfig.delete();
+        }
+        else {
+          this.MillimeterConfig.value = 'true';
+          await this.MillimeterConfig.save();
+        }
+        this.$notify({type: 'success', text: 'Millimeter config successfully updated'});
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: 'Failed to update the millimeter config message'});
       }
     }
   },
@@ -92,6 +121,12 @@ export default {
     }
     catch(error) {
       // no webhook message currently set
+    }
+    try {
+      await this.MillimeterConfig.fetch();
+    }
+    catch(error) {
+      // no set
     }
   }
 };
@@ -113,7 +148,11 @@ export default {
   color: #fff;
   float: right;
 }
-
+.button.millimeter{
+  @extend .button;
+  margin-left: 1em;
+  margin-top: -2.5px;
+}
 
 .url-input {
   margin-left: 1em;
