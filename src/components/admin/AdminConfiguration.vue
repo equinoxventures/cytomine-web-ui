@@ -33,7 +33,7 @@
   <div class="box">
     <h2>{{'Aesthetics'}}</h2>
     <h3>
-      {{'Show mm only:'}}
+      {{'Default is to transition to µm when less than 1mm:'}}
       <button
         :class="['button millimeter', MillimeterConfig.value ? 'is-success' : 'is-danger']"
         @click="ShowMillimeter"
@@ -151,7 +151,7 @@ export default {
 .button.millimeter{
   @extend .button;
   margin-left: 1em;
-  margin-top: -3px;
+  margin-top: -2.5px;
 }
 
 .url-input {
