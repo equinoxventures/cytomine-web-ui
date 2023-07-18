@@ -729,23 +729,30 @@ export default {
       if(webhookUrl.length===0){
         return;
       }
-      await new Promise((resolve) => {
-        setTimeout(resolve, 500);
-      }).then(result =>{
-        console.log(result);
-      }).catch(error=>{
-        console.log(error);
-      });
-      let snapshotID;
+      let snapshotID = '';
       let snapshotURL;
-      this.snapshotFiles = (await SnapshotFileCollection.fetchAll({object: this.image})).array;
-      for (let i = 0; i < this.snapshotFiles.length; i++) {
-        let file = this.snapshotFiles[i];
-        if (file.filename === imageName) {
-          snapshotID = file.id;
-          snapshotURL = this.host + file.url;
+      for (let i = 0; i < 10; i++) {
+        await new Promise((resolve) => {
+          setTimeout(resolve, 200);
+        }).then(result =>{
+          console.log(result);
+        }).catch(error=>{
+          console.log(error);
+        });
+        this.snapshotFiles = (await SnapshotFileCollection.fetchAll({object: this.image})).array;
+        for (let i = 0; i < this.snapshotFiles.length; i++) {
+          let file = this.snapshotFiles[i];
+          if (file.filename === imageName) {
+            snapshotID = file.id.toString();
+            snapshotURL = this.host + file.url;
+          }
+        }
+        if(snapshotID.length > 0){
+          break;
         }
       }
+
+
       const urls = webhookUrl.split(';');
       const headers = {
         'Content-Type': 'application/json'
