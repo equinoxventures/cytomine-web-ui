@@ -215,7 +215,6 @@ import {constLib, operation} from '@/utils/color-manipulation.js';
 
 import constants from '@/utils/constants.js';
 import {SnapshotFile,Configuration,SnapshotFileCollection,Cytomine} from 'cytomine-client-c';
-import axios from 'axios';
 
 
 export default {
@@ -751,39 +750,36 @@ export default {
           break;
         }
       }
-
-
       const urls = webhookUrl.split(';');
-      const headers = {
-        'Content-Type': 'application/json'
-      };
-      const data = {
-        project: {
-          id: this.image.project.toString(),
-          name: this.project.name
-        },
-        image: {
-          id: this.image.id.toString(),
-          name: this.image.filename
-        },
-        snapshot: {
-          id: snapshotID,
-          URL: snapshotURL,
-          pxLeft: canvas.height.toString()+'px',
-          pxTop: canvas.width.toString()+'px',
-        },
-      };
       for (let i = 0; i < urls.length; i++) {
         let url = urls[i];
         if (!/^(http|https):\/\//.test(url)) {
           url = 'http://' + url;
         }
+        const project = {
+          project: {
+            id: this.image.project.toString(),
+            name: this.project.name
+          },
+          image: {
+            id: this.image.id.toString(),
+            name: this.image.filename,
+            thunmbnail:this.image.previewURL()
+          },
+          snapshot: {
+            id: snapshotID,
+            URL: snapshotURL,
+            pxLeft: canvas.height.toString()+'px',
+            pxTop: canvas.width.toString()+'px',
+          },
+          sendUrl: url,
+        };
         try {
-          const response = await axios.post(url, data, {headers});
-          this.$notify({type: 'success', text: response.data});
+          let data = await Cytomine.instance.api.post('/webhook.json', project);
+          this.$notify({type: 'success', text: data.data});
         }
         catch (error) {
-          this.$notify({type: 'error', text: 'Failed: ' + url + ' ' + error});
+          this.$notify({type: 'error', text: error});
         }
       }
 
