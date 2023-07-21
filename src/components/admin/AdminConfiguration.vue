@@ -26,8 +26,20 @@
     <h2>{{'webhook'}}</h2>
     <h3>
       {{'Snapshot Webhook URL:'}}
-      <input type="text" v-model="WebhookConfig.value" class="url-input">
+      <input type="text" v-model="WebhookConfigUrl.value" class="url-input">
       <button class="button is-new-link" @click="saveUrl">{{$t('button-save')}}</button>
+    </h3>
+    <h4 style="height: 10px;"></h4>
+    <h3>
+      {{'Snapshot Webhook Username:'}}
+      <input type="text" v-model="WebhookConfigUsername.value" class="account-input">
+      <span class="spaced">{{'Snapshot Webhook Password:'}}</span>
+      <input :type="passwordFieldType" v-model="WebhookConfigPassword.value" class="account-input">
+      <button type="button" @click="togglePasswordField">
+        <i v-if="passwordFieldType === 'password'" class="fa fa-eye"></i>
+        <i v-else class="fa fa-eye-slash"></i>
+      </button>
+      <button class="button is-new-link" @click="saveAccount">{{$t('button-save')}}</button>
     </h3>
   </div>
   <div class="box">
@@ -56,8 +68,11 @@ export default {
   data() {
     return {
       welcomeConfig: new Configuration({key: constants.CONFIG_KEY_WELCOME, value: '', readingRole: 'all'}),
-      WebhookConfig: new Configuration({key: constants.CONFIG_KEY_WEBHOOK, value: '', readingRole: 'all'}),
+      WebhookConfigUrl: new Configuration({key: constants.CONFIG_KEY_WEBHOOK_URL, value: '', readingRole: 'all'}),
+      WebhookConfigUsername: new Configuration({key: constants.CONFIG_KEY_WEBHOOK_USERNAME, value: '', readingRole: 'all'}),
+      WebhookConfigPassword: new Configuration({key: constants.CONFIG_KEY_WEBHOOK_PASSWORD, value: '', readingRole: 'all'}),
       MillimeterConfig: new Configuration({key: constants.CONFIG_KEY_MILLIMETER, value: '', readingRole: 'all'}),
+      passwordFieldType: 'password',
     };
   },
   methods: {
@@ -78,17 +93,34 @@ export default {
     },
     async saveUrl() {
       try {
-        if(!this.WebhookConfig.value) {
-          await this.WebhookConfig.delete();
+        if(!this.WebhookConfigUrl.value) {
+          await this.WebhookConfigUrl.delete();
         }
         else {
-          await this.WebhookConfig.save();
+          await this.WebhookConfigUrl.save();
         }
         this.$notify({type: 'success', text: 'Webhook URL message successfully updated\n'});
       }
       catch(error) {
         console.log(error);
         this.$notify({type: 'error', text: 'Failed to update the Webhook URL message'});
+      }
+    },
+    async saveAccount() {
+      try {
+        if(!this.WebhookConfigUsername.value && !this.WebhookConfigPassword.value) {
+          await this.WebhookConfigUsername.delete();
+          await this.WebhookConfigPassword.delete();
+        }
+        else {
+          await this.WebhookConfigUsername.save();
+          await this.WebhookConfigPassword.save();
+        }
+        this.$notify({type: 'success', text: 'Webhook account message successfully updated\n'});
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: 'Failed to update the Webhook account message'});
       }
     },
     async ShowMillimeter() {
@@ -107,6 +139,9 @@ export default {
         console.log(error);
         this.$notify({type: 'error', text: 'Failed to update the millimeter config message'});
       }
+    },
+    togglePasswordField() {
+      this.passwordFieldType = this.passwordFieldType === 'password' ? 'text' : 'password';
     }
   },
   async created() {
@@ -117,10 +152,17 @@ export default {
       // no welcome message currently set
     }
     try {
-      await this.WebhookConfig.fetch();
+      await this.WebhookConfigUrl.fetch();
     }
     catch(error) {
       // no webhook message currently set
+    }
+    try {
+      await this.WebhookConfigUsername.fetch();
+      await this.WebhookConfigPassword.fetch();
+    }
+    catch(error) {
+      //no set
     }
     try {
       await this.MillimeterConfig.fetch();
@@ -162,5 +204,15 @@ export default {
   border: 1px solid #ccc;
   border-radius: 4px;
 }
-
+.account-input {
+  margin-left: 1em;
+  flex: 1;
+  width: 30%;
+  padding: 0.5em;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.spaced {
+  margin-left: 10em;
+}
 </style>

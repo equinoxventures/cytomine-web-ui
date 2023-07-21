@@ -264,7 +264,7 @@ export default {
       overview: null,
 
       format: new WKT(),
-      WebhookConfig: new Configuration({key: constants.CONFIG_KEY_WEBHOOK, value: '', readingRole: 'all'}),
+      WebhookConfig: new Configuration({key: constants.CONFIG_KEY_WEBHOOK_URL, value: '', readingRole: 'all'}),
       snapshotFiles: [],
     };
   },
@@ -706,15 +706,14 @@ export default {
         const minutes = String(date.getMinutes()).padStart(2, '0');
         const seconds = String(date.getSeconds()).padStart(2, '0');
         let imageName = 'project_' + this.project.name +'_image_' + this.image.filename +
-          '__' +`${year}-${month}-${day}_${hours}:${minutes}:${seconds}`+'.png';
+          '__' +`${year}-${month}-${day}_${hours}:${minutes}:${seconds}`+'.jpg';
         let containerHeight = document.querySelector('.map-container').clientHeight;
         document.querySelector('.map-container').style.height = containerHeight+'px';
         const canvas = await this.$html2canvas(document.querySelector('.ol-unselectable'));
         canvas.toBlob(async (blob) => {
-          const file= new File([blob], imageName, { type: 'image/png' });
-          let snapshotFile = new SnapshotFile({file: file, filename: imageName},this.imageWrapper.imageInstance).save();
-          await this.$emit(snapshotFile);
-        }, 'image/png');
+          const file= new File([blob], imageName, { type: 'image/jpeg' });
+          SnapshotFile({file: file, filename: imageName},this.imageWrapper.imageInstance).save();
+        }, 'image/jpeg');
         document.querySelector('.map-container').style.height = '';
         this.$notify({type: 'success', text: this.$t(`Success get snapshot ${imageName}`)});
         await this.webhookSnapshot(imageName,canvas);
