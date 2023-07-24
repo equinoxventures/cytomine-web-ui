@@ -214,10 +214,8 @@
     >
       <span class="icon is-small"><i class="fas fa-camera"></i></span>
     </button>
-  </div>
-  <div class="buttons has-addons are-small">
     <button
-      v-if="isToolDisplayed('screenshot')"
+      v-if="isToolDisplayed('snapshot')"
       :disabled="disabledDraw"
       v-tooltip="$t('snapshot')"
       class="button"
@@ -225,7 +223,17 @@
     >
       <span class="icon is-small"><i class="fas fa-image"></i></span>
     </button>
+    <button
+      v-if="isToolDisplayed('snapshot')"
+      :disabled="disabledDraw"
+      v-tooltip="$t('draw-snapshot')"
+      class="button"
+      @click="takeDrawSnapshot()"
+    >
+      <span class="icon is-small"><i class="fas fa-expand"></i></span>
+    </button>
   </div>
+
 
   <div v-if="configUI['project-explore-annotation-main']" class="buttons has-addons are-small">
     <button
@@ -893,6 +901,9 @@ export default {
     takeSnapshot(){
       this.$emit('snapshot');
     },
+    takeDrawSnapshot(){
+      this.$emit('draw-snapshot');
+    },
 
     shortkeyHandler(key) {
       if(key !== 'toggle-all-current' && !this.isActiveImage) { // shortkey should only be applied to active map
@@ -943,7 +954,12 @@ export default {
         case 'tool-screenshot':
           if (this.isToolDisplayed('screenshot') && !this.disabledDraw) {
             this.takeScreenshot();
+          }
+          return;
+        case 'tool-snapshot':
+          if (this.isToolDisplayed('snapshot') && !this.disabledDraw) {
             this.takeSnapshot();
+            this.takeDrawSnapshot();
           }
           return;
         case 'tool-delete':
