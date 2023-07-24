@@ -712,7 +712,8 @@ export default {
         const canvas = await this.$html2canvas(document.querySelector('.ol-unselectable'));
         canvas.toBlob(async (blob) => {
           const file= new File([blob], imageName, { type: 'image/jpeg' });
-          SnapshotFile({file: file, filename: imageName},this.imageWrapper.imageInstance).save();
+          let snapshotFile = new SnapshotFile({file: file, filename: imageName},this.imageWrapper.imageInstance).save();
+          await this.$emit(snapshotFile);
         }, 'image/jpeg');
         document.querySelector('.map-container').style.height = '';
         this.$notify({type: 'success', text: this.$t(`Success get snapshot ${imageName}`)});
