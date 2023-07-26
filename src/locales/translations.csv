@@ -1055,4 +1055,5 @@ images-in-projects,Images in projects,Images au sein des projets
 uploaded-images,Images uploaded,Images téléversées
 step,Step,Saut
 screenshot,Download only, Capture d'écran de l'image actuelle
-snapshot,Saved to slide, Capture d'écran de l'image actuelle
+snapshot,Save to slide, Save to slide
+draw-snapshot,Draw area & save to slide, Draw area & save to slide

@@ -98,6 +98,7 @@ import {Action} from '@/utils/annotation-utils.js';
 import LineString from 'ol/geom/LineString';
 import Circle from 'ol/geom/Circle';
 import constants from '@/utils/constants';
+import {Cytomine} from 'cytomine-client-c';
 
 export default {
   name: 'draw-interaction',
@@ -113,6 +114,7 @@ export default {
       nowCoordinates:[[0,0],[0,0]],
       mouseNowPosition: Array,
       mouseEndDrawn: false,
+      WebhookConfig: new Configuration({key: constants.CONFIG_KEY_WEBHOOK_URL, value: '', readingRole: 'all'}),
       MillimeterConfig: new Configuration({key: constants.CONFIG_KEY_MILLIMETER, value: '', readingRole: 'all'}),
     };
 
@@ -237,7 +239,7 @@ export default {
         (this.startPoint[1] + this.rectangularWidth/2)
       ];
     },
-
+    project: get('currentProject/project'),
     currentUser: get('currentUser/user'),
     imageModule() {
       return this.$store.getters['currentProject/imageModule'](this.index);
@@ -269,6 +271,9 @@ export default {
     selectedFeature() {
       return this.$store.getters[this.imageModule + 'selectedFeature'];
     },
+    host() {
+      return Cytomine.instance.host;
+    },
     drawType() {
       switch(this.activeTool) {
         case 'point':
@@ -277,6 +282,7 @@ export default {
         case 'freehand-line':
           return 'LineString';
         case 'rectangle':
+        case 'draw-snapshot':
         case 'circle':
           return 'Circle';
         case 'polygon':
@@ -296,6 +302,7 @@ export default {
     drawGeometryFunction() {
       switch(this.activeTool){
         case 'rectangle':
+        case 'draw-snapshot':
           return (coordinates, geometry) => {
             this.nowCoordinates = coordinates;
             let rotatedCoords = this.rotateCoords(coordinates, this.rotation);
@@ -397,6 +404,13 @@ export default {
     },
 
     async drawEndHandler({feature}) {
+      if(this.activeTool === 'draw-snapshot'){
+        if(this.nbActiveLayers > 0){
+          await this.endDrawSnapshot(feature);
+        }
+        this.clearDrawnFeatures();
+        return;
+      }
       this.mouseEndDrawn = true;
       if(this.drawCorrection) {
         await this.endCorrection(feature);
@@ -408,6 +422,77 @@ export default {
       this.clearDrawnFeatures();
     },
 
+    async endDrawSnapshot(drawnFeature) {
+      const date = new Date();
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+      let imageName = 'project_' + this.project.name +'_image_' + this.image.filename +
+        '__' +`${year}-${month}-${day}_${hours}:${minutes}:${seconds}`+'.jpg';
+      for (const layer of this.activeLayers) {
+        const sliceSnapshot = {
+          location: this.getWktLocation(drawnFeature),
+          image: this.image.id,
+          slice: this.slice.id,
+          user: layer.id,
+          term: this.termsToAssociate,
+          track: this.tracksToAssociate,
+          width: this.image.width,
+          height: this.image.height,
+          imageName: imageName,
+          imageClass: this.image.class
+        };
+        try {
+          let data = await Cytomine.instance.api.post('/sliceSnapshot.json', sliceSnapshot);
+          this.$notify({type: 'success', text: this.$t(`Success get snapshot ${imageName}`)});
+          await this.webhookSnapshot(data,this.getWktLocation(drawnFeature));
+        }
+        catch (error){
+          this.$notify({type: 'error', text: this.$t(`error: ${error}`)});
+
+        }
+      }
+    },
+    async webhookSnapshot(data,location) {
+      let webhookUrl = this.WebhookConfig.value;
+      if (webhookUrl.length === 0) {
+        return;
+      }
+      const urls = webhookUrl.split(';');
+      for (let i = 0; i < urls.length; i++) {
+        let url = urls[i];
+        if (!/^(http|https):\/\//.test(url)) {
+          url = 'http://' + url;
+        }
+        const project = {
+          project: {
+            id: this.image.project.toString(),
+            name: this.project.name
+          },
+          image: {
+            id: this.image.id.toString(),
+            name: this.image.filename,
+            thunmbnail: this.image.previewURL()
+          },
+          snapshot: {
+            id: data.data.id,
+            URL: this.host + data.data.url,
+            location: location,
+          },
+          sendUrl: url,
+        };
+        try {
+          let data = await Cytomine.instance.api.post('/webhook.json', project);
+          this.$notify({type: 'success', text: data.data});
+        }
+        catch (error) {
+          this.$notify({type: 'error', text: error});
+        }
+      }
+    },
     async endDraw(drawnFeature) {
       this.activeLayers.forEach(async (layer, idx) => {
         let annot = new Annotation({
@@ -476,6 +561,12 @@ export default {
     }
     catch(error) {
       // no set
+    }
+    try {
+      await this.WebhookConfig.fetch();
+    }
+    catch(error) {
+      // no webhook message currently set
     }
   }
 };

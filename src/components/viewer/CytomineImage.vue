@@ -72,7 +72,7 @@
 
     </vl-map>
     <div v-if="configUI['project-tools-main']" class="draw-tools">
-      <draw-tools :index="index" @screenshot="takeScreenshot()" @snapshot="takeSnapshot()" />
+      <draw-tools :index="index" @screenshot="takeScreenshot()" @snapshot="takeSnapshot()"/>
     </div>
 
     <div class="panels">
