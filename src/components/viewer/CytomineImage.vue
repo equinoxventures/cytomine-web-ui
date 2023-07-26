@@ -72,7 +72,7 @@
 
     </vl-map>
     <div v-if="configUI['project-tools-main']" class="draw-tools">
-      <draw-tools :index="index" @screenshot="takeScreenshot()" @snapshot="takeSnapshot()" @draw-snapshot="takeDrawSnapshot"/>
+      <draw-tools :index="index" @screenshot="takeScreenshot()" @snapshot="takeSnapshot()"/>
     </div>
 
     <div class="panels">
@@ -714,32 +714,6 @@ export default {
           const file= new File([blob], imageName, { type: 'image/jpeg' });
           let snapshotFile = new SnapshotFile({file: file, filename: imageName},this.imageWrapper.imageInstance).save();
           await this.$emit(snapshotFile);
-        }, 'image/jpeg');
-        document.querySelector('.map-container').style.height = '';
-        this.$notify({type: 'success', text: this.$t(`Success get snapshot ${imageName}`)});
-        await this.webhookSnapshot(imageName,canvas);
-      }
-      catch (error){
-        this.$notify({type: 'error', text: this.$t(`error: ${error}`)});
-      }
-    },
-    async takeDrawSnapshot() {
-      try {
-        const date = new Date();
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        const hours = String(date.getHours()).padStart(2, '0');
-        const minutes = String(date.getMinutes()).padStart(2, '0');
-        const seconds = String(date.getSeconds()).padStart(2, '0');
-        let imageName = 'project_' + this.project.name +'_image_' + this.image.filename +
-          '__' +`${year}-${month}-${day}_${hours}:${minutes}:${seconds}`+'.jpg';
-        let containerHeight = document.querySelector('.map-container').clientHeight;
-        document.querySelector('.map-container').style.height = containerHeight+'px';
-        const canvas = await this.$html2canvas(document.querySelector('.ol-unselectable'));
-        canvas.toBlob(async (blob) => {
-          const file= new File([blob], imageName, { type: 'image/jpeg' });
-          SnapshotFile({file: file, filename: imageName},this.imageWrapper.imageInstance).save();
         }, 'image/jpeg');
         document.querySelector('.map-container').style.height = '';
         this.$notify({type: 'success', text: this.$t(`Success get snapshot ${imageName}`)});

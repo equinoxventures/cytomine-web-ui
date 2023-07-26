@@ -224,11 +224,12 @@
       <span class="icon is-small"><i class="fas fa-image"></i></span>
     </button>
     <button
-      v-if="isToolDisplayed('snapshot')"
+      v-if="isToolDisplayed('draw-snapshot')"
       :disabled="disabledDraw"
       v-tooltip="$t('draw-snapshot')"
       class="button"
-      @click="takeDrawSnapshot()"
+      :class="{'is-selected': activeTool === 'draw-snapshot'}"
+      @click="activateTool('draw-snapshot')"
     >
       <span class="icon is-small"><i class="fas fa-expand"></i></span>
     </button>
@@ -901,9 +902,6 @@ export default {
     takeSnapshot(){
       this.$emit('snapshot');
     },
-    takeDrawSnapshot(){
-      this.$emit('draw-snapshot');
-    },
 
     shortkeyHandler(key) {
       if(key !== 'toggle-all-current' && !this.isActiveImage) { // shortkey should only be applied to active map
@@ -959,7 +957,6 @@ export default {
         case 'tool-snapshot':
           if (this.isToolDisplayed('snapshot') && !this.disabledDraw) {
             this.takeSnapshot();
-            this.takeDrawSnapshot();
           }
           return;
         case 'tool-delete':
