@@ -261,7 +261,7 @@ import {addProj, createProj, getProj} from 'vuelayers-c/lib/ol-ext';
 
 import View from 'ol/View';
 import OverviewMap from 'ol/control/OverviewMap';
-import {KeyboardPan, KeyboardZoom} from 'ol/interaction';
+import {KeyboardPan, KeyboardZoom, MouseWheelZoom} from 'ol/interaction';
 import {noModifierKeys, targetNotEditable} from 'ol/events/condition';
 import WKT from 'ol/format/WKT';
 
@@ -271,6 +271,7 @@ import {constLib, operation} from '@/utils/color-manipulation.js';
 
 import constants from '@/utils/constants.js';
 import {SnapshotFile,Configuration,SnapshotFileCollection,Cytomine} from 'cytomine-client-c';
+import CustomMouseWheelZoom from '@/components/viewer/newModuls/CustomMouseWheelZoom';
 
 
 export default {
@@ -321,6 +322,7 @@ export default {
 
       format: new WKT(),
       WebhookConfig: new Configuration({key: constants.CONFIG_KEY_WEBHOOK_URL, value: '', readingRole: 'all'}),
+      ScrollZoomConfig: new Configuration({key: constants.CONFIG_KEY_SCROLL_ZOOM, value: '', readingRole: 'all'}),
       snapshotFiles: [],
     };
   },
@@ -540,6 +542,19 @@ export default {
           };
         }
       });
+      if(!this.ScrollZoomConfig.value){
+        this.$nextTick(() => {
+          const interactions = this.$refs.map.$map.getInteractions();
+          const mouseWheelZoomInteraction = interactions.getArray().find(interaction => interaction instanceof MouseWheelZoom);
+          if(mouseWheelZoomInteraction) {
+            interactions.remove(mouseWheelZoomInteraction);
+          }
+          const interaction = new CustomMouseWheelZoom();
+          this.$refs.map.$map.addInteraction(interaction);
+        });
+      }
+
+
     },
 
     async viewMounted() {
@@ -914,6 +929,12 @@ export default {
     }
     catch(error) {
       // no webhook message currently set
+    }
+    try {
+      await this.ScrollZoomConfig.fetch();
+    }
+    catch (error) {
+      // no set
     }
     try {
       await new ImageConsultation({image: this.image.id}).save();

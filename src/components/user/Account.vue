@@ -141,6 +141,24 @@
     </div>
   </div>
 
+  <div class="panel">
+    <p class="panel-heading">
+      <i class="fas fa-adjust" aria-hidden="true"></i>
+      {{ $t('Preferences') }}
+    </p>
+    <div class="panel-block">
+      <h3>
+        <strong>{{'Incremental Scroll and Zoom'}}</strong>
+        <button
+          :class="['button scroll-zoom', ScrollZoomConfig.value ? 'is-danger' : 'is-success']"
+          @click="ShowScrollZoom"
+        >
+          {{ ScrollZoomConfig.value ? $t('disable') : $t('enable') }}
+        </button>
+      </h3>
+    </div>
+  </div>
+
   <div class="panel"> <!-- QUESTION: remove ? or only show for technical users ? -->
     <p class="panel-heading">
       <i class="fas fa-exchange-alt" aria-hidden="true"></i>
@@ -185,9 +203,10 @@
 import {get} from '@/utils/store-helpers';
 import {changeLanguageMixin} from '@/lang.js';
 import _ from 'lodash';
-import {User} from 'cytomine-client-c';
+import {User,Configuration} from 'cytomine-client-c';
 import {rolesMapping} from '@/utils/role-utils';
 import copyToClipboard from 'copy-to-clipboard';
+import constants from '@/utils/constants';
 
 export default {
   name: 'Account',
@@ -206,6 +225,7 @@ export default {
         {value: 'FR', name:'Français'},
         {value: 'ES', name:'Español'}
       ],
+      ScrollZoomConfig: new Configuration({key: constants.CONFIG_KEY_SCROLL_ZOOM, value: '', readingRole: 'all'}),
     };
   },
   computed: {
@@ -299,12 +319,46 @@ export default {
       catch(err) {
         this.$notify({type: 'error', text: this.$t('notif-error-keys-not-regenerated')});
       }
+    },
+    async ShowScrollZoom() {
+      try {
+        if(this.ScrollZoomConfig.value) {
+          this.ScrollZoomConfig.value = '';
+          await this.ScrollZoomConfig.delete();
+        }
+        else {
+          this.ScrollZoomConfig.value = 'true';
+          await this.ScrollZoomConfig.save();
+        }
+        this.$notify({type: 'success', text: 'Scroll and Zoom config successfully updated'});
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: 'Failed to update the Scroll and Zoom config message'});
+      }
+    },
+
+  },
+  async created() {
+    try {
+      await this.ScrollZoomConfig.fetch();
+    }
+    catch (error) {
+      // no set
     }
   }
 };
 </script>
 
 <style scoped>
+
+.button.scroll-zoom{
+  @extend .button;
+  margin-left: 1em;
+  margin-top: -2.5px;
+}
+
+
 .panel {
   max-width: 80em;
   margin-left: auto;
