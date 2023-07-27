@@ -71,6 +71,60 @@
       <modify-interaction v-if="activeModifyInteraction" :index="index" />
 
     </vl-map>
+
+    <div class="mass ">
+      <button
+              v-tooltip="'2x'"
+              class="button"
+              :class="{'is-selected': magnification === 2}"
+              @click="setMagnification(2)"
+      >
+        <span class="icon text" >2x</span>
+      </button>
+      <button
+        v-tooltip="'4x'"
+        class="button"
+        :class="{'is-selected': magnification === 4}"
+        @click="setMagnification(4)"
+      >
+        <span class="icon text" >4x</span>
+      </button>
+      <button
+        v-tooltip="'8x'"
+        class="button"
+        :class="{'is-selected': magnification === 8}"
+        @click="setMagnification(8)"
+      >
+        <span class="icon text" >8x</span>
+      </button>
+      <button
+        v-tooltip="'16x'"
+        class="button"
+        :class="{'is-selected': magnification === 16}"
+        @click="setMagnification(16)"
+      >
+        <span class="icon text" >16x</span>
+      </button>
+      <button
+        v-tooltip="'32x'"
+        class="button"
+        :class="{'is-selected': magnification === 32}"
+        @click="setMagnification(32)"
+      >
+        <span class="icon text" >32x</span>
+      </button>
+      <button
+        v-tooltip="'64x'"
+        class="button"
+        :class="{'is-selected': magnification === 64}"
+        @click="setMagnification(64)"
+      >
+        <span class="icon text" >64x</span>
+      </button>
+    </div>
+
+
+
     <div v-if="configUI['project-tools-main']" class="draw-tools">
       <draw-tools :index="index" @screenshot="takeScreenshot()" @snapshot="takeSnapshot()"/>
     </div>
@@ -172,6 +226,8 @@
       </p>
     </div>
   </template>
+
+
 </div>
 </template>
 
@@ -328,6 +384,10 @@ export default {
         }
       }
     },
+    magnification() {
+      let magnification = Math.pow(2, this.zoom - this.image.zoom) * this.image.magnification;
+      return Math.round(magnification * 10) / 10;
+    },
     activePanel() {
       return this.imageWrapper.activePanel;
     },
@@ -457,7 +517,9 @@ export default {
       }
       this.zoom = this.idealZoom;
     },
-
+    setMagnification(magnification){
+      this.zoom = Math.log(magnification / this.image.magnification) / Math.log(2) + this.image.zoom;
+    },
     async updateMapSize() {
       await this.$nextTick();
       if(this.$refs.map) {
@@ -888,6 +950,7 @@ $colorPanelLink: #eee;
 $colorHoverPanelLink: white;
 $colorBorderPanelLink: #222;
 $colorOpenedPanelLink: #6c95c8;
+$colorActiveIcon: #fff;
 
 .map-container {
   display:flex;
@@ -907,7 +970,27 @@ $colorOpenedPanelLink: #6c95c8;
   right: $widthPanelBar;
   z-index: 30;
 }
-
+.mass {
+  position: absolute;
+  top: 7em;
+  left: 0.7rem;
+  right: $widthPanelBar;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  .button{
+      width: 22px;
+      height: 22px;
+  }
+  .button.is-selected {
+    background-color: #6899d0;
+    color: $colorActiveIcon;
+    path {
+      stroke: $colorActiveIcon;
+    }
+  }
+}
 .broadcast {
   position: absolute;
   right: 4.5rem;
@@ -1006,7 +1089,10 @@ $colorOpenedPanelLink: #6c95c8;
   top: -5.5em;
   bottom: auto;
 }
-
+.text {
+  font-size: 12px;
+  font-weight: 500;
+}
 /* ----- CUSTOM STYLE FOR OL CONTROLS ----- */
 
 .ol-zoom, .ol-rotate {
