@@ -221,10 +221,10 @@
     <annotations-container :index="index" @centerView="centerViewOnAnnot" />
 
     <div class="custom-overview" ref="overview">
-      <p class="image-name" :class="{hidden: overviewCollapsed}">
-        <image-name :image="image" />
-      </p>
     </div>
+    <div class="custom-secondOverview" ref="secondOverview">
+    </div>
+
   </template>
 
 
@@ -235,7 +235,6 @@
 import {get} from '@/utils/store-helpers';
 import _ from 'lodash';
 
-import ImageName from '@/components/image/ImageName';
 import AnnotationLayer from './AnnotationLayer';
 import RotationSelector from './RotationSelector';
 import ScaleLine from './ScaleLine';
@@ -280,7 +279,6 @@ export default {
     index: String
   },
   components: {
-    ImageName,
 
     AnnotationLayer,
 
@@ -587,8 +585,16 @@ export default {
         target: this.$refs.overview,
         collapsed: this.imageWrapper.view.overviewCollapsed
       });
-      map.addControl(this.overview);
+      this.secondOverview = new OverviewMap({
+        view: new View({projection: this.projectionName}),
+        layers: [this.$refs.baseLayer.$layer],
+        tipLabel: this.$t('secondOverview'),
+        target: this.$refs.secondOverview,
+        collapsed: this.imageWrapper.view.overviewCollapsed
+      });
 
+      map.addControl(this.overview);
+      map.addControl(this.secondOverview);
       this.overview.getOverviewMap().on(('click'), (evt) => {
         let size = map.getSize();
         map.getView().centerOn(evt.coordinate, size, [size[0]/2, size[1]/2]);
@@ -1176,6 +1182,24 @@ $colorActiveIcon: #fff;
     &.hidden {
       display: none;
     }
+  }
+}
+.custom-secondOverview {
+  position: absolute;
+  bottom: 175px;
+  left: 0.5em;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  border-radius: 4px;
+
+  .ol-overviewmap {
+    position: static;
+    background: none;
+  }
+
+  .ol-overviewmap:not(.ol-collapsed) button {
+    bottom: 2px !important;
   }
 }
 
