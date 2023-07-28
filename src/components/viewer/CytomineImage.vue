@@ -542,7 +542,7 @@ export default {
           };
         }
       });
-      if(!this.ScrollZoomConfig.value){
+      if(this.ScrollZoomConfig.value === 'false'){
         this.$nextTick(() => {
           const interactions = this.$refs.map.$map.getInteractions();
           const mouseWheelZoomInteraction = interactions.getArray().find(interaction => interaction instanceof MouseWheelZoom);

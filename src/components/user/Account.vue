@@ -150,10 +150,10 @@
       <h3>
         <strong>{{'Incremental Scroll and Zoom'}}</strong>
         <button
-          :class="['button scroll-zoom', ScrollZoomConfig.value ? 'is-danger' : 'is-success']"
+          :class="['button scroll-zoom', ScrollZoomConfig.value === 'true' ? 'is-danger' : 'is-success']"
           @click="ShowScrollZoom"
         >
-          {{ ScrollZoomConfig.value ? $t('disable') : $t('enable') }}
+          {{ ScrollZoomConfig.value === 'true' ? $t('disable') : $t('enable') }}
         </button>
       </h3>
     </div>
@@ -322,9 +322,9 @@ export default {
     },
     async ShowScrollZoom() {
       try {
-        if(this.ScrollZoomConfig.value === 'true') {
-          this.ScrollZoomConfig.value = '';
-          await this.ScrollZoomConfig.delete();
+        if(this.ScrollZoomConfig.value==='true') {
+          this.ScrollZoomConfig.value = 'false';
+          await this.ScrollZoomConfig.save();
         }
         else {
           this.ScrollZoomConfig.value = 'true';
