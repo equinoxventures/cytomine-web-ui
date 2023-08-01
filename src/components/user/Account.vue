@@ -322,7 +322,7 @@ export default {
     },
     async ShowScrollZoom() {
       try {
-        if(this.ScrollZoomConfig.value === 'true') {
+        if(this.ScrollZoomConfig.value) {
           this.ScrollZoomConfig.value = '';
           await this.ScrollZoomConfig.delete();
         }
