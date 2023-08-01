@@ -271,6 +271,7 @@ import {constLib, operation} from '@/utils/color-manipulation.js';
 import constants from '@/utils/constants.js';
 import {SnapshotFile,Configuration,SnapshotFileCollection,Cytomine} from 'cytomine-client-c';
 import CustomMouseWheelZoom from '@/components/viewer/newModuls/CustomMouseWheelZoom';
+import CustomOverviewMap from '@/components/viewer/newModuls/CustomOverviewMap';
 
 
 export default {
@@ -577,7 +578,6 @@ export default {
       await this.$refs.baseLayer.$createPromise; // wait for ol.Layer to be created
 
       let map = this.$refs.map.$map;
-
       this.overview = new OverviewMap({
         view: new View({projection: this.projectionName}),
         layers: [this.$refs.baseLayer.$layer],
@@ -585,22 +585,23 @@ export default {
         target: this.$refs.overview,
         collapsed: this.imageWrapper.view.overviewCollapsed
       });
-      this.secondOverview = new OverviewMap({
-        view: new View({projection: this.projectionName}),
+      this.secondOverview = new CustomOverviewMap({
+        view: new View({projection: this.projectionName,center:[0,0]}),
         layers: [this.$refs.baseLayer.$layer],
         tipLabel: this.$t('secondOverview'),
         target: this.$refs.secondOverview,
         collapsed: this.imageWrapper.view.overviewCollapsed
       });
-
       map.addControl(this.overview);
       map.addControl(this.secondOverview);
-      this.overview.getOverviewMap().on(('click'), (evt) => {
-        let size = map.getSize();
-        map.getView().centerOn(evt.coordinate, size, [size[0]/2, size[1]/2]);
-      });
+      this.secondOverview.getOverviewMap().on('click', this.handleClickEvent);
+      this.overview.getOverviewMap().on('click', this.handleClickEvent);
     },
-
+    handleClickEvent(evt) {
+      let map = this.$refs.map.$map;
+      let size = map.getSize();
+      map.getView().centerOn(evt.coordinate, size, [size[0]/2, size[1]/2]);
+    },
     toggleOverview() {
       if (this.overview) {
         this.overview.setCollapsed(!this.imageWrapper.view.overviewCollapsed);
@@ -1167,6 +1168,10 @@ $colorActiveIcon: #fff;
   .ol-overviewmap {
     position: static;
     background: none;
+    .ol-overviewmap-map{
+      height: 250px ;
+      width: 250px ;
+    }
   }
 
   .ol-overviewmap:not(.ol-collapsed) button {
@@ -1192,10 +1197,14 @@ $colorActiveIcon: #fff;
   display: flex;
   flex-direction: column;
   border-radius: 4px;
-
+  margin-block-end: 100px;
   .ol-overviewmap {
     position: static;
     background: none;
+    .ol-overviewmap-map{
+      height: 250px ;
+      width: 250px ;
+    }
   }
 
   .ol-overviewmap:not(.ol-collapsed) button {
