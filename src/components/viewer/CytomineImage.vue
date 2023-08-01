@@ -586,10 +586,11 @@ export default {
         collapsed: this.imageWrapper.view.overviewCollapsed
       });
       this.secondOverview = new CustomOverviewMap({
-        view: new View({projection: this.projectionName,center:[0,0]}),
+        view: new View({projection: this.projectionName}),
         layers: [this.$refs.baseLayer.$layer],
         tipLabel: this.$t('secondOverview'),
         target: this.$refs.secondOverview,
+        imageSize: this.imageSize,
         collapsed: this.imageWrapper.view.overviewCollapsed
       });
       map.addControl(this.overview);
