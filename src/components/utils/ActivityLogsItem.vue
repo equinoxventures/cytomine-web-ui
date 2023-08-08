@@ -61,6 +61,8 @@ export default {
           return IMAGE;
         case 'projectService':
           return PROJECT;
+        default:
+          return null;
       }
     }
   },
