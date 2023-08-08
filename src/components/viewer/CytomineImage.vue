@@ -225,9 +225,6 @@
     <annotations-container :index="index" @centerView="centerViewOnAnnot" />
 
     <div class="custom-overview" ref="overview">
-      <p class="image-name" :class="{hidden: overviewCollapsed}">
-        <image-name :image="image" />
-      </p>
     </div>
   </template>
 
@@ -239,7 +236,6 @@
 import {get} from '@/utils/store-helpers';
 import _ from 'lodash';
 
-import ImageName from '@/components/image/ImageName';
 import AnnotationLayer from './AnnotationLayer';
 import RotationSelector from './RotationSelector';
 import ScaleLine from './ScaleLine';
@@ -284,7 +280,6 @@ export default {
     index: String
   },
   components: {
-    ImageName,
 
     AnnotationLayer,
 

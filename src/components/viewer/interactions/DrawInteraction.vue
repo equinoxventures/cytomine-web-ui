@@ -297,7 +297,8 @@ export default {
       return this.activeTool === 'select';
     },
     drawFreehand() {
-      return this.activeTool === 'freehand-polygon' || this.activeTool === 'freehand-line' || this.drawCorrection;
+      return this.activeTool === 'freehand-polygon' || this.activeTool === 'freehand-line' || this.activeTool === 'circle' ||
+        this.activeTool === 'rectangle' || this.drawCorrection;
     },
     drawGeometryFunction() {
       switch(this.activeTool){
