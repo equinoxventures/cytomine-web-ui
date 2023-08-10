@@ -7,8 +7,7 @@ on:
    - release/*
    - pims  
   pull_request:
-    branches: [ "master" ]
-    branches: [ "pims" ]
+    branches: [ "master" , "pims" ]
 
 jobs:
 
