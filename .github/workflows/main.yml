@@ -27,7 +27,7 @@ jobs:
     - name: Build the Docker image
       run: |
         docker build --no-cache . --file scripts/docker/web-ui/Dockerfile --tag seapapa/web_ui_pims:${{ steps.commit.outputs.short }}
-        docker tag seapapa/web_ui:${{ steps.commit.outputs.short }} seapapa/web_ui_pims:latest
+        docker tag seapapa/web_ui_pims:${{ steps.commit.outputs.short }} seapapa/web_ui_pims:latest
 
     - name: Docker push
       run: | 
