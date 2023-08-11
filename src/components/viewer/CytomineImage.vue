@@ -904,6 +904,9 @@ export default {
     },
   },
   async created() {
+    if(!this.image.magnification){
+      this.image.magnification = 20;
+    }
     if(!getProj(this.projectionName)) { // if image opened for the first time
       let projection = createProj({code: this.projectionName, units: 'pixels', extent: this.extent});
       addProj(projection);
