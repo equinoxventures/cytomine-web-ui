@@ -72,55 +72,58 @@
 
     </vl-map>
 
-    <div class="mass ">
-      <button
-              v-tooltip="'2x'"
-              class="button"
-              :class="{'is-selected': magnification === 2}"
-              @click="setMagnification(2)"
-      >
-        <span class="icon text" >2x</span>
-      </button>
-      <button
-        v-tooltip="'4x'"
-        class="button"
-        :class="{'is-selected': magnification === 4}"
-        @click="setMagnification(4)"
-      >
-        <span class="icon text" >4x</span>
-      </button>
-      <button
-        v-tooltip="'8x'"
-        class="button"
-        :class="{'is-selected': magnification === 8}"
-        @click="setMagnification(8)"
-      >
-        <span class="icon text" >8x</span>
-      </button>
-      <button
-        v-tooltip="'16x'"
-        class="button"
-        :class="{'is-selected': magnification === 16}"
-        @click="setMagnification(16)"
-      >
-        <span class="icon text" >16x</span>
-      </button>
-      <button
-        v-tooltip="'32x'"
-        class="button"
-        :class="{'is-selected': magnification === 32}"
-        @click="setMagnification(32)"
-      >
-        <span class="icon text" >32x</span>
-      </button>
-      <button
-        v-tooltip="'64x'"
-        class="button"
-        :class="{'is-selected': magnification === 64}"
-        @click="setMagnification(64)"
-      >
-        <span class="icon text" >64x</span>
-      </button>
+    <div class="ol-zoom ol-unselectable ol-control ">
+      <dvi class="mass">
+        <button
+          v-tooltip="'2x'"
+          class="button"
+          :class="{'is-selected': magnification === 2}"
+          @click="setMagnification(2)"
+        >
+          <span class="icon text" >2x</span>
+        </button>
+        <button
+          v-tooltip="'4x'"
+          class="button"
+          :class="{'is-selected': magnification === 4}"
+          @click="setMagnification(4)"
+        >
+          <span class="icon text" >4x</span>
+        </button>
+        <button
+          v-tooltip="'8x'"
+          class="button"
+          :class="{'is-selected': magnification === 8}"
+          @click="setMagnification(8)"
+        >
+          <span class="icon text" >8x</span>
+        </button>
+        <button
+          v-tooltip="'16x'"
+          class="button"
+          :class="{'is-selected': magnification === 16}"
+          @click="setMagnification(16)"
+        >
+          <span class="icon text" >16x</span>
+        </button>
+        <button
+          v-tooltip="'32x'"
+          class="button"
+          :class="{'is-selected': magnification === 32}"
+          @click="setMagnification(32)"
+        >
+          <span class="icon text" >32x</span>
+        </button>
+        <button
+          v-tooltip="'64x'"
+          class="button"
+          :class="{'is-selected': magnification === 64}"
+          @click="setMagnification(64)"
+        >
+          <span class="icon text" >64x</span>
+        </button>
+
+      </dvi>
     </div>
 
 
@@ -1001,16 +1004,18 @@ $colorActiveIcon: #fff;
 }
 .mass {
   position: absolute;
-  top: 7em;
-  left: 0.7rem;
+  top: 50px;
+  left: 2px;
   right: $widthPanelBar;
   z-index: 30;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  width: 30px;
   .button{
       width: 22px;
       height: 22px;
+      border-color: #dbdbdb;
   }
   .button.is-selected {
     background-color: #6899d0;
@@ -1119,8 +1124,8 @@ $colorActiveIcon: #fff;
   bottom: auto;
 }
 .text {
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 9px ;
+  font-weight: 400;
 }
 /* ----- CUSTOM STYLE FOR OL CONTROLS ----- */
 
@@ -1132,22 +1137,24 @@ $colorActiveIcon: #fff;
 .ol-rotate:not(.custom) {
   display: none;
 }
+.rotation-selector-wrapper.rotation-selector-wrapper{
+  top: 200px;
+}
 
 .ol-control button {
   background: white !important;
   color: black !important;
-  border-radius: 2px !important;
+  border-radius: 0 !important;
   box-shadow: 0 0 1px #777;
-
+  margin: 0 !important;
+  width: 22px;
+  height: 22px;
   &:hover {
     box-shadow: 0 0 1px black;
     cursor: pointer;
   }
 }
 
-.ol-zoom-in {
-  margin-bottom: 5px !important;
-}
 
 /* ----- Rotation selector ----- */
 .rotation-selector-wrapper {
