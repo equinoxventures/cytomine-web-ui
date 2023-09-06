@@ -596,6 +596,13 @@ export default {
         imageSize: this.imageSize,
         collapsed: this.imageWrapper.view.overviewCollapsed
       });
+      let aspectRatio = this.imageSize[1]/this.imageSize[0];
+      if (aspectRatio > 1){
+        if (aspectRatio > 1.8){
+          aspectRatio = 1.8;
+        }
+        this.secondOverview.ovmapDiv_.style.height = 150 * aspectRatio + 'px';
+      }
       map.addControl(this.overview);
       map.addControl(this.secondOverview);
       this.secondOverview.getOverviewMap().on('click', this.handleClickEvent);
@@ -1176,10 +1183,6 @@ $colorActiveIcon: #fff;
   .ol-overviewmap {
     position: static;
     background: none;
-    //.ol-overviewmap-map{
-    //  height: 250px ;
-    //  width: 250px ;
-    //}
   }
 
   .ol-overviewmap:not(.ol-collapsed) button {
@@ -1205,14 +1208,9 @@ $colorActiveIcon: #fff;
   display: flex;
   flex-direction: column;
   border-radius: 4px;
-  //margin-block-end: 100px;
   .ol-overviewmap {
     position: static;
     background: none;
-    .ol-overviewmap-map{
-      height: 250px ;
-      width: 250px ;
-    }
   }
 
   .ol-overviewmap:not(.ol-collapsed) button {
