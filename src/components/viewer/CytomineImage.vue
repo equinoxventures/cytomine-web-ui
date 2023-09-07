@@ -597,16 +597,25 @@ export default {
         collapsed: this.imageWrapper.view.overviewCollapsed
       });
       let aspectRatio = this.imageSize[1]/this.imageSize[0];
-      if (aspectRatio > 1){
-        if (aspectRatio > 1.8){
-          aspectRatio = 1.8;
-        }
-        this.secondOverview.ovmapDiv_.style.height = 150 * aspectRatio + 'px';
-      }
+      this.secondOverview.ovmapDiv_.style.height = 150 * aspectRatio + 'px';
+
       map.addControl(this.overview);
       map.addControl(this.secondOverview);
+
+
       this.secondOverview.getOverviewMap().on('click', this.handleClickEvent);
       this.overview.getOverviewMap().on('click', this.handleClickEvent);
+      let ovview = this.secondOverview.ovmap_.getView();
+      let imageCenter = [this.imageSize[0]/2,this.imageSize[1]/2];
+      ovview.setCenter(imageCenter);
+
+      // // reset ovmapSize,but the mouse position is wrong
+      // let ovmapSize = this.secondOverview.ovmap_.getSize();
+      // let ovextent = ovview.calculateExtent(ovmapSize);
+      // let ratioX = (ovextent[2] - ovextent[0])/this.imageSize[0];
+      // let ratioY = (ovextent[3] - ovextent[1])/this.imageSize[1];
+      // ovmapSize[0] = ovmapSize[0] / ratioX;
+      // ovmapSize[1] = ovmapSize[1] / ratioY;
     },
     handleClickEvent(evt) {
       let map = this.$refs.map.$map;
