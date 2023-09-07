@@ -20,7 +20,7 @@
 
 
   <!-- show line length -->
-  <vl-overlay v-if="startPoint[0] > 0 && this.activeTool === 'line' " :position="lineTextPosition">
+  <vl-overlay v-if="startPoint[0] > 0 && this.activeTool === 'line' && this.DrawingLines" :position="lineTextPosition">
     <div class="overlay">
       <div class="draw-content">
         <div class="line-text-new">{{ lineShowLength }}</div>
@@ -54,7 +54,7 @@
   </vl-overlay>
 
   <!-- show rectangular length -->
-  <vl-overlay v-if="startPoint[0] > 0 && this.activeTool === 'rectangle' " :position="rectangularLengthPosition">
+  <vl-overlay v-if="startPoint[0] > 0 && this.activeTool === 'rectangle'" :position="rectangularLengthPosition">
     <div class="overlay">
       <div class="draw-content">
         <div class="line-text ">{{ rectangularShowLength }}</div>
@@ -114,6 +114,8 @@ export default {
       nowCoordinates:[[0,0],[0,0]],
       mouseNowPosition: Array,
       mouseEndDrawn: false,
+      items: [],
+      DrawingLines: false,
       WebhookConfig: new Configuration({key: constants.CONFIG_KEY_WEBHOOK_URL, value: '', readingRole: 'all'}),
       MillimeterConfig: new Configuration({key: constants.CONFIG_KEY_MILLIMETER, value: '', readingRole: 'all'}),
     };
@@ -145,7 +147,7 @@ export default {
     },
     lineItems(){
       const items = [];
-      for (let i = 0; i < this.nowCoordinates.length -2 ; i++) {
+      for (let i = 0; i < this.nowCoordinates.length - 2 ; i++) {
         const deltaX = this.nowCoordinates[i+1][0] - this.nowCoordinates[i][0];
         const deltaY = this.nowCoordinates[i+1][1] - this.nowCoordinates[i][1];
         items.push({
@@ -153,6 +155,11 @@ export default {
           lineShowLength: this.computeShowLength(Math.sqrt(deltaX * deltaX + deltaY * deltaY).toFixed(2)),
         });
       }
+      console.log(items);
+      if (this.items.length > items.length){
+        return this.items;
+      }
+      this.updateItems(items);
       return items;
     },
     lineLength(){
@@ -371,6 +378,9 @@ export default {
   },
 
   methods: {
+    updateItems(items){
+      this.items = items;
+    },
     updateMousePosition(){
       this.mouseNowPosition = this.mousePosition;
       this.mouseNowPosition = this.nowCoordinates[this.nowCoordinates.length - 1];
@@ -398,6 +408,8 @@ export default {
     },
     drawStart(){
       this.startPoint=this.mousePosition;
+      this.items = [];
+      this.DrawingLines = true;
       this.mouseEndDrawn = false;
     },
     clearDrawnFeatures() {
@@ -405,6 +417,8 @@ export default {
     },
 
     async drawEndHandler({feature}) {
+      this.DrawingLines = false;
+      this.mouseEndDrawn = true;
       if(this.activeTool === 'draw-snapshot'){
         if(this.nbActiveLayers > 0){
           await this.endDrawSnapshot(feature);
@@ -412,7 +426,6 @@ export default {
         this.clearDrawnFeatures();
         return;
       }
-      this.mouseEndDrawn = true;
       if(this.drawCorrection) {
         await this.endCorrection(feature);
       }
@@ -494,6 +507,11 @@ export default {
         }
       }
     },
+    shortkeyHandler(key) {
+      if(key === 'tool-finish-line'){
+        this.$refs.olDrawInteraction.$interaction.finishDrawing();
+      }
+    },
     async endDraw(drawnFeature) {
       this.activeLayers.forEach(async (layer, idx) => {
         let annot = new Annotation({
@@ -569,6 +587,12 @@ export default {
     catch(error) {
       // no webhook message currently set
     }
+  },
+  mounted() {
+    this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
+  },
+  beforeDestroy() {
+    this.$eventBus.$off('shortkeyEvent', this.shortkeyHandler);
   }
 };
 </script>
