@@ -4,7 +4,7 @@ const shortkey = (browser && browser.os === 'Mac OS') ? 'meta' : 'ctrl';
 
 // Key list reference: https://github.com/iFgR/vue-shortkey#key-list
 export default Object.freeze({
-  'general-close-modal': ['esc'], // Handled by Bulma
+  // 'general-close-modal': ['esc'], // Handled by Bulma
   'general-shortcuts-modal': ['shift', '?'],
   // 'navbar-dashboard': ['g', 'd'],
   // 'navbar-projects': ['g', 'p'],
@@ -55,6 +55,7 @@ export default Object.freeze({
   'viewer-tool-polygon': ['p'],
   'viewer-tool-freehand-polygon': ['shift', 'p'],
   'viewer-tool-screenshot': ['shift', 's'],
+  // 'viewer-tool-snapshot': ['shift', 'f'],
   'viewer-tool-fill': ['f'],
   'viewer-tool-correct-add': ['shift', 'c'],
   'viewer-tool-correct-remove': ['alt', 'shift', 'c'],
@@ -68,6 +69,7 @@ export default Object.freeze({
   'viewer-tool-paste': [shortkey, 'v'],
   'viewer-tool-undo': [shortkey, 'z'],
   'viewer-tool-redo': [shortkey, 'y'],
+  'viewer-tool-finish-line': ['esc'],
   'viewer-tool-review-accept': ['j'],
   'viewer-tool-review-reject': ['k'],
   'viewer-toggle-review-layer': ['i'],
