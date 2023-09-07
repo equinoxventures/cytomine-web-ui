@@ -48,7 +48,7 @@
     <div class="overlay">
       <div class="draw-content">
         <div class="line-text">{{ lineShowLength }}</div>
-        <div class="dashed-line" :style="{width: (lineLength/this.image.magnification*this.magnification).toFixed(0) + 'px' }"></div>
+        <div class="dashed-line" :style="{width: (lineLength/this.magnification).toFixed(0) + 'px' }"></div>
       </div>
     </div>
   </vl-overlay>
@@ -128,7 +128,7 @@ export default {
       return this.mouseNowPosition;
     },
     magnification() {
-      let magnification = Math.pow(2, this.zoom - this.image.zoom) * this.image.magnification;
+      let magnification = Math.pow(2, this.zoom - this.image.zoom) ;
       return Math.round(magnification * 100) / 100;
     },
     circleCenterPosition(){
@@ -176,10 +176,10 @@ export default {
       return this.computeShowLength(this.rectangularWidth);
     },
     rectangularLengthPixel(){
-      return (this.rectangularLength/this.image.magnification*this.magnification).toFixed(0);
+      return (this.rectangularLength*this.magnification).toFixed(0);
     },
     rectangularWidthPixel(){
-      return (this.rectangularWidth/this.image.magnification*this.magnification).toFixed(0);
+      return (this.rectangularWidth*this.magnification).toFixed(0);
     },
     rectangularLengthPosition(){
       if ((this.nowMousePosition[0] - this.startPoint[0]<0)){
@@ -385,7 +385,7 @@ export default {
           length /= 1000;
           unit = this.$t('mm');
         }
-        return `${length.toFixed(3)} ${unit}`;
+        return `${length.toFixed(2)} ${unit}`;
       }
       else {
         return `${Math.round(length*1000) / 1000} ${this.$t('pixels')}`;
