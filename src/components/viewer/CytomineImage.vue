@@ -225,6 +225,9 @@
 
     <div class="custom-overview" ref="overview">
     </div>
+    <div class="custom-secondOverview" ref="secondOverview">
+    </div>
+
   </template>
 
 
@@ -271,6 +274,7 @@ import {constLib, operation} from '@/utils/color-manipulation.js';
 import constants from '@/utils/constants.js';
 import {SnapshotFile,Configuration,SnapshotFileCollection,Cytomine} from 'cytomine-client-c';
 import CustomMouseWheelZoom from '@/components/viewer/newModuls/CustomMouseWheelZoom';
+import CustomOverviewMap from '@/components/viewer/newModuls/CustomOverviewMap';
 
 
 export default {
@@ -577,7 +581,6 @@ export default {
       await this.$refs.baseLayer.$createPromise; // wait for ol.Layer to be created
 
       let map = this.$refs.map.$map;
-
       this.overview = new OverviewMap({
         view: new View({projection: this.projectionName}),
         layers: [this.$refs.baseLayer.$layer],
@@ -585,14 +588,40 @@ export default {
         target: this.$refs.overview,
         collapsed: this.imageWrapper.view.overviewCollapsed
       });
-      map.addControl(this.overview);
-
-      this.overview.getOverviewMap().on(('click'), (evt) => {
-        let size = map.getSize();
-        map.getView().centerOn(evt.coordinate, size, [size[0]/2, size[1]/2]);
+      this.secondOverview = new CustomOverviewMap({
+        view: new View({projection: this.projectionName}),
+        layers: [this.$refs.baseLayer.$layer],
+        tipLabel: this.$t('secondOverview'),
+        target: this.$refs.secondOverview,
+        imageSize: this.imageSize,
+        collapsed: this.imageWrapper.view.overviewCollapsed
       });
-    },
+      let aspectRatio = this.imageSize[1]/this.imageSize[0];
+      this.secondOverview.ovmapDiv_.style.height = 150 * aspectRatio + 'px';
 
+      map.addControl(this.overview);
+      map.addControl(this.secondOverview);
+
+
+      this.secondOverview.getOverviewMap().on('click', this.handleClickEvent);
+      this.overview.getOverviewMap().on('click', this.handleClickEvent);
+      let ovview = this.secondOverview.ovmap_.getView();
+      let imageCenter = [this.imageSize[0]/2,this.imageSize[1]/2];
+      ovview.setCenter(imageCenter);
+
+      // // reset ovmapSize,but the mouse position is wrong
+      // let ovmapSize = this.secondOverview.ovmap_.getSize();
+      // let ovextent = ovview.calculateExtent(ovmapSize);
+      // let ratioX = (ovextent[2] - ovextent[0])/this.imageSize[0];
+      // let ratioY = (ovextent[3] - ovextent[1])/this.imageSize[1];
+      // ovmapSize[0] = ovmapSize[0] / ratioX;
+      // ovmapSize[1] = ovmapSize[1] / ratioY;
+    },
+    handleClickEvent(evt) {
+      let map = this.$refs.map.$map;
+      let size = map.getSize();
+      map.getView().centerOn(evt.coordinate, size, [size[0]/2, size[1]/2]);
+    },
     toggleOverview() {
       if (this.overview) {
         this.overview.setCollapsed(!this.imageWrapper.view.overviewCollapsed);
@@ -1178,6 +1207,23 @@ $colorActiveIcon: #fff;
     &.hidden {
       display: none;
     }
+  }
+}
+.custom-secondOverview {
+  position: absolute;
+  bottom: 175px;
+  left: 0.5em;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  border-radius: 4px;
+  .ol-overviewmap {
+    position: static;
+    background: none;
+  }
+
+  .ol-overviewmap:not(.ol-collapsed) button {
+    bottom: 2px !important;
   }
 }
 
