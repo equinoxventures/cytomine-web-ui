@@ -384,6 +384,5 @@ export default {
 
 .ontology-tree.editable .sl-vue-tree-sidebar {
   display: flex;
-  align-items: top;
 }
 </style>

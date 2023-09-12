@@ -129,6 +129,10 @@ const props = {
     type: Boolean,
     default: false,
   },
+  annotationDrawLineColor: {
+    type: String,
+    default: '#0099FF',
+  }
 };
 
 /**
@@ -174,7 +178,7 @@ const methods = {
    * @protected
    */
   getDefaultStyles () {
-    const defaultStyles = mapValues(defaultEditStyle(), styles => styles.map(createStyle));
+    const defaultStyles = mapValues(defaultEditStyle(this.annotationDrawLineColor), styles => styles.map(createStyle));
     console.log(defaultStyles);
     return function __selectDefaultStyleFunc (feature) {
       if (feature.getGeometry()) {

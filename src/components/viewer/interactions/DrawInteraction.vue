@@ -81,6 +81,7 @@
     :freehand="drawFreehand"
     :freehand-condition="undefined"
     :geometry-function="drawGeometryFunction"
+    :annotationDrawLineColor="this.annotationLineColorConfig.value"
     @drawend="drawEndHandler"
     @drawstart="drawStart"
   />
@@ -118,6 +119,7 @@ export default {
       DrawingLines: false,
       WebhookConfig: new Configuration({key: constants.CONFIG_KEY_WEBHOOK_URL, value: '', readingRole: 'all'}),
       MillimeterConfig: new Configuration({key: constants.CONFIG_KEY_MILLIMETER, value: '', readingRole: 'all'}),
+      annotationLineColorConfig: new Configuration({key: constants.CONFIG_KEY_ANNOTATION_LINE_COLOR, value: '', readingRole: 'all'}),
     };
 
   },
@@ -586,6 +588,12 @@ export default {
     }
     catch(error) {
       // no webhook message currently set
+    }
+    try {
+      await this.annotationLineColorConfig.fetch();
+    }
+    catch(error) {
+      // no set
     }
   },
   mounted() {

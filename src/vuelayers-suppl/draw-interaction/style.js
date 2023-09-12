@@ -3,11 +3,10 @@ import { GEOMETRY_TYPE } from 'vuelayers-c/src/ol-ext/consts';
 /**
  * @return {Object<GEOMETRY_TYPE, VlStyle[]>}
  */
-export function defaultEditStyle () {
+export function defaultEditStyle (color) {
   /** @type {Object<GEOMETRY_TYPE, VlStyle[]>} */
   let styles = {};
   let white = [255, 255, 255, 1];
-  let blue = [0, 153, 255, 1];
   let width = 3;
 
   styles[GEOMETRY_TYPE.LINE_STRING] = [
@@ -15,7 +14,7 @@ export function defaultEditStyle () {
       strokeColor: white,
       strokeWidth: width + 2,
     }, {
-      strokeColor: blue,
+      strokeColor: color,
       strokeWidth: width,
     },
   ];
@@ -38,7 +37,7 @@ export function defaultEditStyle () {
   styles[GEOMETRY_TYPE.POINT] = [
     {
       imageRadius: width * 2,
-      fillColor: blue,
+      fillColor: color,
       strokeColor: white,
       strokeWidth: width / 2,
       zIndex: Infinity,
