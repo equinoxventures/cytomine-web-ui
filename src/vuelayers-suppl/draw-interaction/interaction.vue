@@ -131,10 +131,13 @@ const props = {
   },
   annotationDrawLineColor: {
     type: String,
-    default: '#0099FF',
   }
 };
-
+const computed = {
+  computedLineColor() {
+    return this.annotationDrawLineColor || '#0099FF';
+  }
+};
 /**
  * @vueMethods
  */
@@ -178,8 +181,7 @@ const methods = {
    * @protected
    */
   getDefaultStyles () {
-    const defaultStyles = mapValues(defaultEditStyle(this.annotationDrawLineColor), styles => styles.map(createStyle));
-    console.log(defaultStyles);
+    const defaultStyles = mapValues(defaultEditStyle(this.computedLineColor), styles => styles.map(createStyle));
     return function __selectDefaultStyleFunc (feature) {
       if (feature.getGeometry()) {
         return defaultStyles[feature.getGeometry().getType()];
@@ -235,6 +237,7 @@ const methods = {
   subscribeAll () {
     subscribeToInteractionChanges.call(this);
   },
+
 };
 // todo other props?
 const watch = makeWatchers(['source', 'type'], () => function () {
@@ -252,6 +255,7 @@ export default {
   props,
   methods,
   watch,
+  computed,
   stubVNode: {
     empty: false,
     attrs () {
