@@ -74,7 +74,14 @@ export default {
     },
     async save() {
       this.annotationLineColor.value = this.color.hex;
-      await this.annotationLineColor.save();
+      try {
+        await this.annotationLineColor.save();
+        this.$notify({type: 'success', text: 'annotation line color message successfully updated\n'});
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: 'Failed to update the annotation line color message'});
+      }
       // this.$emit('color-changed', this.color.hex);
     },
   },

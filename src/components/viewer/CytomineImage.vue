@@ -67,7 +67,8 @@
       />
 
       <select-interaction v-if="activeSelectInteraction" :index="index" />
-      <draw-interaction v-if="activeDrawInteraction" :index="index" :mousePosition="projectedMousePosition" :zoom="zoom"/>
+      <draw-interaction v-if="activeDrawInteraction" :index="index" :mousePosition="projectedMousePosition" :zoom="zoom"
+                        :AnnotationLineColorConfig="AnnotationLineColorConfig" :WebhookConfig="WebhookConfig" :MillimeterConfig="MillimeterConfig"/>
       <modify-interaction v-if="activeModifyInteraction" :index="index" />
 
     </vl-map>
@@ -321,6 +322,8 @@ export default {
       format: new WKT(),
       WebhookConfig: new Configuration({key: constants.CONFIG_KEY_WEBHOOK_URL, value: '', readingRole: 'all'}),
       ScrollZoomConfig: new Configuration({key: constants.CONFIG_KEY_SCROLL_ZOOM, value: '', readingRole: 'all'}),
+      AnnotationLineColorConfig: new Configuration({key: constants.CONFIG_KEY_ANNOTATION_LINE_COLOR, value: '', readingRole: 'all'}),
+      MillimeterConfig: new Configuration({key: constants.CONFIG_KEY_MILLIMETER, value: '', readingRole: 'all'}),
       snapshotFiles: [],
     };
   },
@@ -921,6 +924,18 @@ export default {
         console.log(error);
         this.$notify({type: 'error', text: this.$t('notif-error-target-annotation')});
       }
+    }
+    try {
+      await this.MillimeterConfig.fetch();
+    }
+    catch(error) {
+      // no set
+    }
+    try {
+      await this.AnnotationLineColorConfig.fetch();
+    }
+    catch(error) {
+      // no set
     }
     try {
       await this.WebhookConfig.fetch();
