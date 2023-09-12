@@ -157,7 +157,6 @@ export default {
           lineShowLength: this.computeShowLength(Math.sqrt(deltaX * deltaX + deltaY * deltaY).toFixed(2)),
         });
       }
-      console.log(items);
       if (this.items.length > items.length){
         return this.items;
       }
