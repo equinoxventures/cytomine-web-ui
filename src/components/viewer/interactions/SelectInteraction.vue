@@ -139,6 +139,7 @@ export default {
     async styleFunctionFactory() {
       // HACK: style function is not called again when redefined => force the update of style for selected features
       if(this.$refs.interactionSelect && this.$refs.interactionSelect.$interaction) {
+        await this.$store.dispatch(this.imageModule + 'updatedAnnotationColor');
         await this.$refs.interactionSelect.$interaction.getFeatures().forEach(ft => ft.changed());
       }
     }

@@ -46,6 +46,8 @@ import {
   rejectedSelectStyles,
   trackedSelectStyles
 } from '@/utils/style-utils.js';
+import {Stroke, Style} from 'ol/style';
+import {Configuration} from 'cytomine-client-c';
 
 export default {
   namespaced: true,
@@ -58,7 +60,7 @@ export default {
       loadedSlicePages: [],
       activeSlice: null,
       activePanel: null,
-
+      color: '#0099FF',
       routedAnnotation: null
     };
   },
@@ -105,7 +107,13 @@ export default {
     },
     clearRoutedAnnotation(state) {
       state.routedAnnotation = null;
+    },
+    updatedAnnotationColor(state,annotationLineColorConfig){
+      if(annotationLineColorConfig.value){
+        state.color = annotationLineColorConfig.value;
+      }
     }
+
   },
 
   actions: {
@@ -120,7 +128,15 @@ export default {
       commit('setProfile', profile);
 
       await dispatch('fetchSliceInstancesAround', {rank: clone.rank});
+
     },
+    async updatedAnnotationColor({commit}){
+      let annotationLineColorConfig = new Configuration({key: constants.CONFIG_KEY_ANNOTATION_LINE_COLOR, value: '', readingRole: 'all'});
+      await annotationLineColorConfig.fetch();
+      commit('updatedAnnotationColor',annotationLineColorConfig);
+
+    },
+
     async setImageInstance({dispatch, rootState}, {image, slice}) {
       await dispatch('initialize', {image, slice});
       let idProject = rootState.currentProject.project.id;
@@ -259,8 +275,9 @@ export default {
 
       // Styles for selected elements
       if(state.selectedFeatures.selectedFeatures.map(ftr => ftr.id).includes(feature.getId())) {
+        let selectStroke = new Stroke({color: state.color,width: 2});
+        selectStyles[1] = new Style({ stroke: selectStroke });
         styles.push(...(isReviewed ? reviewedSelectStyles : isRejected ? rejectedSelectStyles : (nbTracks > 0) ? trackedSelectStyles : selectStyles));
-
         // if in modify mode, display vertices
         if(state.draw.activeEditTool === 'modify') {
           styles.push(verticesStyle);

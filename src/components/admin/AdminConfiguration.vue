@@ -52,6 +52,12 @@
       >
         {{ MillimeterConfig.value ? $t('enable') : $t('disable') }}      </button>
     </h3>
+    <h3>
+      {{'Active annotation color:'}}
+      <button
+        class="button annotation-color" @click="UpdateAnnotationLineColor" :style="{ backgroundColor: annotationLineColorConfig.value }">{{$t('select')}}
+      </button>
+    </h3>
   </div>
 </div>
 </template>
@@ -61,10 +67,11 @@
 import CytomineQuillEditor from '@/components/form/CytomineQuillEditor';
 import {Configuration} from 'cytomine-client-c';
 import constants from '@/utils/constants.js';
+import AnnotationLineColorModal from './AnnotationLineColorModal.vue';
 
 export default {
   name: 'admin-configuration',
-  components: {CytomineQuillEditor},
+  components: {CytomineQuillEditor,},
   data() {
     return {
       welcomeConfig: new Configuration({key: constants.CONFIG_KEY_WELCOME, value: '', readingRole: 'all'}),
@@ -72,6 +79,7 @@ export default {
       WebhookConfigUsername: new Configuration({key: constants.CONFIG_KEY_WEBHOOK_USERNAME, value: '', readingRole: 'all'}),
       WebhookConfigPassword: new Configuration({key: constants.CONFIG_KEY_WEBHOOK_PASSWORD, value: '', readingRole: 'all'}),
       MillimeterConfig: new Configuration({key: constants.CONFIG_KEY_MILLIMETER, value: '', readingRole: 'all'}),
+      annotationLineColorConfig: new Configuration({key: constants.CONFIG_KEY_ANNOTATION_LINE_COLOR, value: '', readingRole: 'all'}),
       passwordFieldType: 'password',
     };
   },
@@ -142,8 +150,28 @@ export default {
     },
     togglePasswordField() {
       this.passwordFieldType = this.passwordFieldType === 'password' ? 'text' : 'password';
-    }
+    },
+
+    UpdateAnnotationLineColor() {
+      this.openModal();
+    },
+    openModal() {
+      this.$buefy.modal.open({
+        parent: this,
+        props: {
+          annotationLineColor: this.annotationLineColorConfig
+        },
+        component: AnnotationLineColorModal,
+        hasModalCard: true,
+        // events: {
+        //   'color-changed': (newColor) => {
+        //     this.annotationLineColorConfig.value = newColor;
+        //   }
+        // }
+      });
+    },
   },
+
   async created() {
     try {
       await this.welcomeConfig.fetch();
@@ -166,6 +194,12 @@ export default {
     }
     try {
       await this.MillimeterConfig.fetch();
+    }
+    catch(error) {
+      // no set
+    }
+    try {
+      await this.annotationLineColorConfig.fetch();
     }
     catch(error) {
       // no set
@@ -193,9 +227,15 @@ export default {
 .button.millimeter{
   @extend .button;
   margin-left: 1em;
-  margin-top: -2.5px;
+  margin-top: -3.5px;
 }
-
+.button.annotation-color{
+  @extend .button;
+  margin-left: 1em;
+  color: #fff;
+  background-color: #3273dc;
+  margin-top: -3.5px;
+}
 .url-input {
   margin-left: 1em;
   flex: 1;

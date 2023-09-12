@@ -81,6 +81,7 @@
     :freehand="drawFreehand"
     :freehand-condition="undefined"
     :geometry-function="drawGeometryFunction"
+    :annotationDrawLineColor="AnnotationLineColorConfig.value"
     @drawend="drawEndHandler"
     @drawstart="drawStart"
   />
@@ -93,11 +94,10 @@ import {get} from '@/utils/store-helpers';
 import Polygon, {fromCircle as polygonFromCircle} from 'ol/geom/Polygon';
 import WKT from 'ol/format/WKT';
 
-import {Annotation, AnnotationType,Configuration} from 'cytomine-client-c';
+import {Annotation, AnnotationType} from 'cytomine-client-c';
 import {Action} from '@/utils/annotation-utils.js';
 import LineString from 'ol/geom/LineString';
 import Circle from 'ol/geom/Circle';
-import constants from '@/utils/constants';
 import {Cytomine} from 'cytomine-client-c';
 
 export default {
@@ -106,6 +106,10 @@ export default {
     index: String,
     mousePosition: Array,
     zoom: Number,
+    AnnotationLineColorConfig: Object,
+    WebhookConfig:Object,
+    MillimeterConfig:Object
+
   },
   data() {
     return {
@@ -116,8 +120,6 @@ export default {
       mouseEndDrawn: false,
       items: [],
       DrawingLines: false,
-      WebhookConfig: new Configuration({key: constants.CONFIG_KEY_WEBHOOK_URL, value: '', readingRole: 'all'}),
-      MillimeterConfig: new Configuration({key: constants.CONFIG_KEY_MILLIMETER, value: '', readingRole: 'all'}),
     };
 
   },
@@ -155,7 +157,6 @@ export default {
           lineShowLength: this.computeShowLength(Math.sqrt(deltaX * deltaX + deltaY * deltaY).toFixed(2)),
         });
       }
-      console.log(items);
       if (this.items.length > items.length){
         return this.items;
       }
@@ -574,20 +575,7 @@ export default {
       return this.format.writeFeature(feature);
     },
   },
-  async created() {
-    try {
-      await this.MillimeterConfig.fetch();
-    }
-    catch(error) {
-      // no set
-    }
-    try {
-      await this.WebhookConfig.fetch();
-    }
-    catch(error) {
-      // no webhook message currently set
-    }
-  },
+
   mounted() {
     this.$eventBus.$on('shortkeyEvent', this.shortkeyHandler);
   },
