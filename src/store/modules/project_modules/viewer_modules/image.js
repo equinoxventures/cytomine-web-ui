@@ -127,9 +127,12 @@ export default {
 
       await dispatch('fetchSliceInstancesAround', {rank: clone.rank});
 
+    },
+    async updatedAnnotationColor({commit}){
       let annotationLineColorConfig = new Configuration({key: constants.CONFIG_KEY_ANNOTATION_LINE_COLOR, value: '', readingRole: 'all'});
       await annotationLineColorConfig.fetch();
       commit('updatedAnnotationColor',annotationLineColorConfig);
+
     },
 
     async setImageInstance({dispatch, rootState}, {image, slice}) {
