@@ -109,7 +109,9 @@ export default {
       state.routedAnnotation = null;
     },
     updatedAnnotationColor(state,annotationLineColorConfig){
-      state.color = annotationLineColorConfig.value;
+      if(annotationLineColorConfig.value){
+        state.color = annotationLineColorConfig.value;
+      }
     }
 
   },
