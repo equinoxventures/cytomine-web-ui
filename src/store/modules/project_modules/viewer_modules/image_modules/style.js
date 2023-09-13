@@ -22,6 +22,8 @@ import {
   createLineStrokeStyle,
   createColorStyleWithTransparentFill, changeNoTermOpacity
 } from '@/utils/style-utils.js';
+import {Stroke} from 'ol/style';
+import {asArray as hexToRgb} from 'ol/color';
 let initialNoTermsOpacity = 0;
 let initialTermsOpacity = 1;
 let initialTracksOpacity = 1;
@@ -190,9 +192,20 @@ function formatTerms(terms, layersOpacity, previousTerms=[]) {
   for(let i = 0; i < nbTerms; i++) {
     let term = terms[i];
     let prevTerm = previousTerms.find(prevTerm => prevTerm.id === term.id);
-    result.push(prevTerm ? prevTerm : formatTerm(term, layersOpacity));
+    result.push(prevTerm ? prevTerm : formatTermChangeLineColor(term,layersOpacity));
   }
   return result;
+}
+
+function formatTermChangeLineColor(term,layersOpacity){
+  let formatTerm_ = formatTerm(term, layersOpacity);
+  let changeColorStyle = createColorStyle(term.color, initialTermsOpacity*layersOpacity);
+  let colorArray = hexToRgb(term.color);
+  let colorWithOpacity = colorArray.slice();
+  colorWithOpacity[3] = 1;
+  changeColorStyle.setStroke(new Stroke({color: colorWithOpacity, width: 2}));
+  formatTerm_.olStyle = changeColorStyle;
+  return formatTerm_;
 }
 
 function formatTerm(term, layersOpacity) {
