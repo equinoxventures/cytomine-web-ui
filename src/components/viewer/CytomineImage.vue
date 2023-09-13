@@ -508,6 +508,7 @@ export default {
   watch: {
     viewState() {
       this.savePosition();
+      this.$store.dispatch(this.imageModule + 'updatedAnnotationColor');
     },
     overviewCollapsed(value) {
       this.$store.commit(this.imageModule + 'setOverviewCollapsed', value);
