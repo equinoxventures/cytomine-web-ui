@@ -61,7 +61,7 @@
     <h3 style="margin-top: 10px">
       {{'Default annotation line color:'}}
       <button
-        class="button annotation-color" @click="UpdateNoTermLineColor" :style="{ backgroundColor: noTermLineColor.value }">{{$t('select')}}
+        class="button no-term-color" @click="UpdateNoTermLineColor" :style="{ backgroundColor: noTermLineColor.value }">{{$t('select')}}
       </button>
     </h3>
   </div>
@@ -252,6 +252,15 @@ export default {
   background-color: #3273dc;
   margin-top: -3.5px;
 }
+
+.button.no-term-color{
+  @extend .button.annotation;
+  margin-left: 1em;
+  color: #fff;
+  background-color: #000000;
+  margin-top: -3.5px;
+}
+
 .url-input {
   margin-left: 1em;
   flex: 1;
