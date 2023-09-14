@@ -24,6 +24,8 @@ import {
 } from '@/utils/style-utils.js';
 import {Stroke} from 'ol/style';
 import {asArray as hexToRgb} from 'ol/color';
+import constants from '@/utils/constants';
+import {Configuration} from 'cytomine-client-c';
 let initialNoTermsOpacity = 0;
 let initialTermsOpacity = 1;
 let initialTracksOpacity = 1;
@@ -33,7 +35,6 @@ export default {
   state() {
     return {
       terms: null,
-
       displayNoTerm: true,
       noTermOpacity: initialNoTermsOpacity,
       noTermStyle: createColorStyleWithTransparentFill('#fff', initialLayersOpacity*initialNoTermsOpacity),
@@ -81,7 +82,16 @@ export default {
       state.noTermOpacity = opacity;
       changeNoTermOpacity(state.noTermStyle, state.layersOpacity*opacity);
     },
-
+    setNoTermStyle(state,noTermLineColorConfig){
+      if(noTermLineColorConfig.value){
+        let noTermStyle = createColorStyleWithTransparentFill('#fff', initialLayersOpacity*initialNoTermsOpacity);
+        let colorArray = hexToRgb(noTermLineColorConfig.value);
+        let colorWithOpacity = colorArray.slice();
+        colorWithOpacity[3] = 1;
+        noTermStyle.setStroke(new Stroke({color: colorWithOpacity, width: 2}));
+        state.noTermStyle = noTermStyle;
+      }
+    },
     resetTermOpacities(state) {
       state.terms.forEach(term => {
         term.opacity = initialTermsOpacity;
@@ -129,7 +139,12 @@ export default {
         commit('removeTermFromSelectedFeatures', {idTerm: toggledTerm.id, terms: state.terms});
       }
     },
+    async setNoTermStyle({commit}){
+      let noTermLineColorConfig = new Configuration({key: constants.CONFIG_KEY_NO_TERM_LINE_COLOR, value: '', readingRole: 'all'});
+      await noTermLineColorConfig.fetch();
+      commit('setNoTermStyle',noTermLineColorConfig);
 
+    },
     setDisplayNoTerm({commit}, value) {
       commit('setDisplayNoTerm', value);
       if(!value) {

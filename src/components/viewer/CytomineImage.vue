@@ -508,7 +508,6 @@ export default {
   watch: {
     viewState() {
       this.savePosition();
-      this.$store.dispatch(this.imageModule + 'updatedAnnotationColor');
     },
     overviewCollapsed(value) {
       this.$store.commit(this.imageModule + 'setOverviewCollapsed', value);
@@ -926,6 +925,8 @@ export default {
         this.$notify({type: 'error', text: this.$t('notif-error-target-annotation')});
       }
     }
+    await this.$store.dispatch(this.imageModule + 'updatedAnnotationColor');
+    await this.$store.dispatch(this.imageModule + 'setNoTermStyle');
     try {
       await this.MillimeterConfig.fetch();
     }
