@@ -52,10 +52,16 @@
       >
         {{ MillimeterConfig.value ? $t('enable') : $t('disable') }}      </button>
     </h3>
-    <h3>
+    <h3 style="margin-top: 10px">
       {{'Active annotation color:'}}
       <button
         class="button annotation-color" @click="UpdateAnnotationLineColor" :style="{ backgroundColor: annotationLineColorConfig.value }">{{$t('select')}}
+      </button>
+    </h3>
+    <h3 style="margin-top: 10px">
+      {{'Default annotation line color:'}}
+      <button
+        class="button annotation-color" @click="UpdateNoTermLineColor" :style="{ backgroundColor: noTermLineColor.value }">{{$t('select')}}
       </button>
     </h3>
   </div>
@@ -80,6 +86,7 @@ export default {
       WebhookConfigPassword: new Configuration({key: constants.CONFIG_KEY_WEBHOOK_PASSWORD, value: '', readingRole: 'all'}),
       MillimeterConfig: new Configuration({key: constants.CONFIG_KEY_MILLIMETER, value: '', readingRole: 'all'}),
       annotationLineColorConfig: new Configuration({key: constants.CONFIG_KEY_ANNOTATION_LINE_COLOR, value: '', readingRole: 'all'}),
+      noTermLineColor: new Configuration({key: constants.CONFIG_KEY_NO_TERM_LINE_COLOR, value: '', readingRole: 'all'}),
       passwordFieldType: 'password',
     };
   },
@@ -153,13 +160,16 @@ export default {
     },
 
     UpdateAnnotationLineColor() {
-      this.openModal();
+      this.openModal(this.annotationLineColorConfig);
     },
-    openModal() {
+    UpdateNoTermLineColor() {
+      this.openModal(this.noTermLineColor);
+    },
+    openModal(config) {
       this.$buefy.modal.open({
         parent: this,
         props: {
-          annotationLineColor: this.annotationLineColorConfig
+          annotationLineColor: config
         },
         component: AnnotationLineColorModal,
         hasModalCard: true,
@@ -173,6 +183,24 @@ export default {
   },
 
   async created() {
+    try {
+      await this.MillimeterConfig.fetch();
+    }
+    catch(error) {
+      // no set
+    }
+    try {
+      await this.annotationLineColorConfig.fetch();
+    }
+    catch(error) {
+      // no set
+    }
+    try {
+      await this.noTermLineColor.fetch();
+    }
+    catch(error) {
+      // no set
+    }
     try {
       await this.welcomeConfig.fetch();
     }
@@ -191,18 +219,6 @@ export default {
     }
     catch(error) {
       //no set
-    }
-    try {
-      await this.MillimeterConfig.fetch();
-    }
-    catch(error) {
-      // no set
-    }
-    try {
-      await this.annotationLineColorConfig.fetch();
-    }
-    catch(error) {
-      // no set
     }
   }
 };
