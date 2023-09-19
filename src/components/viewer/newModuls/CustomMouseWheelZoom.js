@@ -63,8 +63,7 @@ class CustomMouseWheelZoom extends MouseWheelZoom {
         Mode.TRACKPAD :
         Mode.WHEEL;
     }
-    console.log(delta);
-    console.log(this.mode_);
+
     if (this.mode_ === Mode.TRACKPAD) {
       var view = map.getView();
       if (this.trackpadTimeoutId_) {
