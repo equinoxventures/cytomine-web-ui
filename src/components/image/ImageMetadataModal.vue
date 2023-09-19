@@ -14,7 +14,7 @@
 
 <template>
 <cytomine-modal :active="active" :title="$t('image-metadata')" @close="$emit('update:active', false)">
-  <b-message v-if="error" type="is-danger" has-icon icon-size="is-small">
+  <b-message v-if="metadataError" type="is-danger" has-icon icon-size="is-small">
     <h2> {{ $t('error') }} </h2>
     <p> {{ $t('unexpected-error-info-message') }} </p>
   </b-message>
@@ -52,7 +52,6 @@
 </template>
 
 <script>
-import {AbstractImage, PropertyCollection} from 'cytomine-client-c';
 import CytomineModal from '@/components/utils/CytomineModal';
 import {getWildcardRegexp} from '@/utils/string-utils';
 
@@ -60,13 +59,13 @@ export default {
   name: 'image-metadata-modal',
   props: {
     active: Boolean,
-    image: Object
+    image: Object,
+    metadataError: Boolean,
+    properties: Object,
   },
   components: {CytomineModal},
   data() {
     return {
-      error: false,
-      properties: [],
       searchString: '',
       rotationAngle: 0
     };
@@ -99,17 +98,6 @@ export default {
       this.rotationAngle = (this.rotationAngle + val + 360) % 360;
     }
   },
-  async created() {
-    try {
-      let abstractImage = new AbstractImage({id: this.image.baseImage, class: 'be.cytomine.image.AbstractImage'});
-      this.properties = (await PropertyCollection.fetchAll({object: abstractImage})).array;
-      this.properties.sort((a, b) => a.key.localeCompare(b.key));
-    }
-    catch(error) {
-      console.log(error);
-      this.error = true;
-    }
-  }
 };
 </script>
 

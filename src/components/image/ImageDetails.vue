@@ -86,7 +86,7 @@
       <tr v-if="isPropDisplayed('snapshot-files')">
         <td class="prop-label">{{$t('snapshot-files')}}</td>
         <td class="prop-content" colspan="3">
-          <attached-snapshot :object="image" :canEdit="canEdit" />
+          <attached-snapshot :object="image" :canEdit="canEdit" :metadata-error="metadataError" :properties="this.properties"/>
         </td>
       </tr>
       <tr v-if="isPropDisplayed('slide-preview')">
@@ -282,6 +282,8 @@
   <image-metadata-modal
     :active.sync="isMetadataModalActive"
     :image="image"
+    :metadata-error="metadataError"
+    :properties="properties"
   />
 </div>
 </template>
@@ -306,6 +308,7 @@ import {formatMinutesSeconds} from '@/utils/slice-utils.js';
 import {ImageInstance} from 'cytomine-client-c';
 
 import vendorFromMime from '@/utils/vendor';
+import {AbstractImage, PropertyCollection} from 'cytomine-client-c';
 
 export default {
   name: 'image-details',
@@ -332,6 +335,8 @@ export default {
       isCalibrationModalActive: false,
       isMagnificationModalActive: false,
       isMetadataModalActive: false,
+      metadataError: false,
+      properties: [],
     };
   },
   computed: {
@@ -430,6 +435,17 @@ export default {
     },
     formatMinutesSeconds(time) {
       return formatMinutesSeconds(time);
+    }
+  },
+  async created() {
+    try {
+      let abstractImage = new AbstractImage({id: this.image.baseImage, class: 'be.cytomine.image.AbstractImage'});
+      this.properties = (await PropertyCollection.fetchAll({object: abstractImage})).array;
+      this.properties.sort((a, b) => a.key.localeCompare(b.key));
+    }
+    catch(error) {
+      console.log(error);
+      this.metadataError = true;
     }
   }
 };
