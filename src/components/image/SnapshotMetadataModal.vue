@@ -44,7 +44,7 @@
     </template>
 
     <template #footer>
-      <button class="button" type="button" @click="$emit('update:active', false)">
+      <button class="button" type="button" @click="viewSnapshot">
         {{$t('View')}}
       </button>
 
@@ -81,6 +81,7 @@ export default {
     file: Object,
     index: Number,
     snapshotFiles: Object,
+    project: Object,
   },
   components: {CytomineModal},
   data() {
@@ -156,6 +157,9 @@ export default {
           text: this.$t('notif-error-attached-snapshot-deletion', {filename: snapshotFile.filename})
         });
       }
+    },
+    viewSnapshot(){
+      this.$router.push(`/project/${this.project.id}/image/${this.image.id}/snapshot/${this.file.location}`);
     },
     downImageJPG(){
       window.open(this.host+this.file.url);

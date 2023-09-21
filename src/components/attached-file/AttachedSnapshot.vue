@@ -34,6 +34,7 @@
     :file="file"
     :index="index"
     :snapshotFiles="snapshotFiles"
+    :project="this.project"
   />
 </div>
 </template>
@@ -52,6 +53,7 @@ export default {
     canEdit: {type: Boolean, default: true},
     metadataError: Boolean,
     properties: Object,
+    project: Object,
   },
   data() {
     return {

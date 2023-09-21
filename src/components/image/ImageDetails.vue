@@ -86,7 +86,8 @@
       <tr v-if="isPropDisplayed('snapshot-files')">
         <td class="prop-label">{{$t('snapshot-files')}}</td>
         <td class="prop-content" colspan="3">
-          <attached-snapshot :object="image" :canEdit="canEdit" :metadata-error="metadataError" :properties="this.properties"/>
+          <attached-snapshot :object="image" :canEdit="canEdit" :metadata-error="metadataError"
+                             :properties="this.properties" :project="this.project"/>
         </td>
       </tr>
       <tr v-if="isPropDisplayed('slide-preview')">
