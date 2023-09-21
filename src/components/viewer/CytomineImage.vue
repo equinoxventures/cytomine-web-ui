@@ -560,10 +560,14 @@ export default {
 
     async viewMounted() {
       await this.$refs.view.$createPromise; // wait for ol.View to be created
-      if(this.routedAnnotation) {
-        this.centerViewOnAnnot(this.routedAnnotation, 500);
+      if(this.$route.params.idSnapshot){
+        let geometry = this.format.readGeometry(this.$route.params.idSnapshot);
+        await this.$refs.view.fit(geometry, {duration:500, padding: [10, 10, 10, 10], maxZoom: this.image.zoom});
       }
-      this.savePosition();
+      if(this.routedAnnotation) {
+        await this.centerViewOnAnnot(this.routedAnnotation, 500);
+      }
+      await this.savePosition();
     },
 
     async setBaseSource() {
@@ -644,6 +648,7 @@ export default {
     },
 
     async centerViewOnAnnot(annot, duration) {
+
       if (annot.image === this.image.id) {
         if (!annot.location) {
           //in case annotation location has not been loaded
@@ -651,7 +656,7 @@ export default {
         }
 
         let geometry = this.format.readGeometry(annot.location);
-        this.$refs.view.fit(geometry, {duration, padding: [10, 10, 10, 10], maxZoom: this.image.zoom});
+        await this.$refs.view.fit(geometry, {duration, padding: [10, 10, 10, 10], maxZoom: this.image.zoom});
 
         // HACK: center set by view.fit() is incorrect => reset it manually
         this.center = (geometry.getType() === 'Point') ? geometry.getFirstCoordinate()
@@ -687,7 +692,7 @@ export default {
           if (center) {
             await this.viewMounted();
             let duration = (sliceChange) ? undefined : 500;
-            this.centerViewOnAnnot(annot, duration);
+            await this.centerViewOnAnnot(annot, duration);
           }
         }
         catch(error) {

@@ -18,7 +18,7 @@
     <em v-if="error">{{$t('error-attached-snapshot')}}</em>
     <template v-else-if="snapshotFiles.length > 0">
       <span class="file-item" v-for="(file, index) in snapshotFiles" :key="file.id">
-        <a :href="host + file.url">{{file.filename}}</a>
+        <a @click="openView(file,index) ">{{file.filename}}</a>
         <button v-if="canEdit" class="delete is-small" @click="confirmDeletion(file, index)"></button>
         <template v-if="index < snapshotFiles.length - 1">,</template>
       </span>
@@ -26,25 +26,43 @@
     <em v-else>{{$t('no-attached-snapshot')}} </em>
     <button v-if="canEdit" class="button is-small" @click="displayModal()">{{$t('button-add')}}</button>
   </template>
+  <snapshot-metadata-modal
+    :active.sync="isMetadataModalActive"
+    :image="object"
+    :metadata-error="metadataError"
+    :properties="properties"
+    :file="file"
+    :index="index"
+    :snapshotFiles="snapshotFiles"
+    :project="this.project"
+  />
 </div>
 </template>
 
 <script>
 import {Cytomine,SnapshotFileCollection} from 'cytomine-client-c';
 import AttachedSnapshotModal from './AttachedSnapshotModal.vue';
+import SnapshotMetadataModal from '@/components/image/SnapshotMetadataModal.vue';
 
 
 export default {
   name: 'attached-snapshot',
+  components: {SnapshotMetadataModal},
   props: {
     object: {type: Object},
-    canEdit: {type: Boolean, default: true}
+    canEdit: {type: Boolean, default: true},
+    metadataError: Boolean,
+    properties: Object,
+    project: Object,
   },
   data() {
     return {
       loading: true,
       error: false,
-      snapshotFiles: []
+      snapshotFiles: [],
+      isMetadataModalActive: false,
+      file: null,
+      index: null,
     };
   },
   computed: {
@@ -53,6 +71,11 @@ export default {
     }
   },
   methods: {
+    openView(file,index){
+      this.isMetadataModalActive=true;
+      this.file = file;
+      this.index = index;
+    },
     displayModal() {
       // required to use programmatic modal because the description is sometimes displayed in elements with a
       // CSS transform (e.g. popover) that conflict with the fixed position of the modal

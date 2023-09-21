@@ -202,7 +202,7 @@ export default {
           let uniqueArray = imgAndSlices.filter(function(item, pos) {
             return imgAndSlices.map(function(e) {
               return e.image+'.'+e.slice;
-            }).indexOf(item.image+'.'+item.slice) == pos;
+            }).indexOf(item.image+'.'+item.slice) === pos;
           });
           await Promise.all(uniqueArray.map(async (e) => {
             let image = await ImageInstance.fetch(e.image);
@@ -218,7 +218,7 @@ export default {
             let image = await ImageInstance.fetch(id);
             images[id] = image;
           }));
-          const imagesNotInCurrentProject = Object.values(images).filter(image => image.project != this.project.id);
+          const imagesNotInCurrentProject = Object.values(images).filter(image => image.project !== this.project.id);
           if (imagesNotInCurrentProject.length > 0) {
             this.errorBadImageProject = true;
             throw new Error('Some images are not from this project');

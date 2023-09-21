@@ -93,8 +93,9 @@ export default {
   actions: {
     changePath({getters}) {
       let idAnnotation = router.currentRoute.params.idAnnotation;
+      let idSnapshot = router.currentRoute.params.idSnapshot;
       let action = router.currentRoute.query.action;
-      router.replace(getters.pathViewer({idAnnotation, action}));
+      router.replace(getters.pathViewer({idAnnotation, idSnapshot,action}));
     },
 
     async addImage({state, commit, getters, dispatch}, {image, slice, annot=null}) {
@@ -194,14 +195,18 @@ export default {
       return [...getters.pathModule, 'images', index];
     },
 
-    pathViewer: (state, getters) => ({idAnnotation, action}={}) => {
+    pathViewer: (state, getters) => ({idAnnotation, idSnapshot,action}={}) => {
       // module path = ['projects', idProject, 'viewers', idViewer]
       let idProject = getters.pathModule[1];
       let idViewer = getters.pathModule[3];
       // ---
       let imagesIds = Object.values(state.images).map(img => img.imageInstance ? img.imageInstance.id : 0);
       let slicesIds = Object.values(state.images).map(img => img.activeSlice ? img.activeSlice.id : 0);
-      let annot = idAnnotation ? `/annotation/${idAnnotation}` : '';
+      let annot = idSnapshot
+        ? `/snapshot/${idSnapshot}`
+        : idAnnotation
+          ? `/annotation/${idAnnotation}`
+          : '';
       let actionStr = action ? '&action=' + action : '';
       return `/project/${idProject}/image/${imagesIds.join('-')}/slice/${slicesIds.join('-')}${annot}?viewer=${idViewer}${actionStr}`;
     },
