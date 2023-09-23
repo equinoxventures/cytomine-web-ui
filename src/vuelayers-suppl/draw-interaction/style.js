@@ -3,12 +3,16 @@ import { GEOMETRY_TYPE } from 'vuelayers-c/src/ol-ext/consts';
 /**
  * @return {Object<GEOMETRY_TYPE, VlStyle[]>}
  */
-export function defaultEditStyle (color) {
+export function defaultEditStyle (color,activeTools) {
   /** @type {Object<GEOMETRY_TYPE, VlStyle[]>} */
   let styles = {};
   let white = [255, 255, 255, 1];
   let width = 3;
-
+  let opacity = 0.5;
+  if(activeTools === 'draw-snapshot'){
+    opacity = 0;
+    width = 2.5;
+  }
   styles[GEOMETRY_TYPE.LINE_STRING] = [
     {
       strokeColor: white,
@@ -23,7 +27,7 @@ export function defaultEditStyle (color) {
 
   styles[GEOMETRY_TYPE.POLYGON] = [
     {
-      fillColor: [255, 255, 255, 0.5],
+      fillColor: [255, 255, 255, opacity],
     },
   ].concat(styles[GEOMETRY_TYPE.LINE_STRING]);
   styles[GEOMETRY_TYPE.MULTI_POLYGON] =
