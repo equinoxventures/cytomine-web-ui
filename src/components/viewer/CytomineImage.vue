@@ -67,7 +67,7 @@
       />
 
       <select-interaction v-if="activeSelectInteraction" :index="index" />
-      <draw-interaction v-if="activeDrawInteraction" :index="index" :mousePosition="projectedMousePosition" :zoom="zoom"
+      <draw-interaction v-if="activeDrawInteraction" :index="index" :mousePosition="projectedMousePosition" :zoom="zoom" :map="this.$refs.map"
                         :AnnotationLineColorConfig="AnnotationLineColorConfig" :WebhookConfig="WebhookConfig" :MillimeterConfig="MillimeterConfig"/>
       <modify-interaction v-if="activeModifyInteraction" :index="index" />
 
@@ -270,8 +270,9 @@ import {ImageConsultation, Annotation, AnnotationType, UserPosition, SliceInstan
 import {constLib, operation} from '@/utils/color-manipulation.js';
 
 import constants from '@/utils/constants.js';
-import {SnapshotFile,Configuration,SnapshotFileCollection,Cytomine} from 'cytomine-client-c';
+import {Configuration,Cytomine} from 'cytomine-client-c';
 import CustomMouseWheelZoom from '@/components/viewer/newModuls/CustomMouseWheelZoom';
+import {fromExtent} from 'ol/geom/Polygon';
 
 
 export default {
@@ -306,25 +307,18 @@ export default {
   data() {
     return {
       minZoom: 0,
-
       projectedMousePosition: [0, 0],
-
       baseSource: null,
       routedAnnotation: null,
       selectedAnnotation: null,
-
       timeoutSavePosition: null,
-
       loading: true,
-
       overview: null,
-
       format: new WKT(),
       WebhookConfig: new Configuration({key: constants.CONFIG_KEY_WEBHOOK_URL, value: '', readingRole: 'all'}),
       ScrollZoomConfig: new Configuration({key: constants.CONFIG_KEY_SCROLL_ZOOM, value: '', readingRole: 'all'}),
       AnnotationLineColorConfig: new Configuration({key: constants.CONFIG_KEY_ANNOTATION_LINE_COLOR, value: '', readingRole: 'all'}),
       MillimeterConfig: new Configuration({key: constants.CONFIG_KEY_MILLIMETER, value: '', readingRole: 'all'}),
-      snapshotFiles: [],
     };
   },
   computed: {
@@ -508,6 +502,8 @@ export default {
   watch: {
     viewState() {
       this.savePosition();
+
+
     },
     overviewCollapsed(value) {
       this.$store.commit(this.imageModule + 'setOverviewCollapsed', value);
@@ -562,7 +558,7 @@ export default {
       await this.$refs.view.$createPromise; // wait for ol.View to be created
       if(this.$route.params.idSnapshot){
         let geometry = this.format.readGeometry(this.$route.params.idSnapshot);
-        await this.$refs.view.fit(geometry, {duration:500, padding: [10, 10, 10, 10], maxZoom: this.image.zoom});
+        await this.$refs.view.fit(geometry, {duration:500, maxZoom: this.image.zoom});
       }
       if(this.routedAnnotation) {
         await this.centerViewOnAnnot(this.routedAnnotation, 500);
@@ -788,50 +784,40 @@ export default {
         const hours = String(date.getHours()).padStart(2, '0');
         const minutes = String(date.getMinutes()).padStart(2, '0');
         const seconds = String(date.getSeconds()).padStart(2, '0');
-        let imageName = 'project_' + this.project.name +'_image_' + this.image.filename +
+        let snapshotName = 'project_' + this.project.name +'_image_' + this.image.filename +
           '__' +`${year}-${month}-${day}_${hours}:${minutes}:${seconds}`+'.jpg';
         let containerHeight = document.querySelector('.map-container').clientHeight;
         document.querySelector('.map-container').style.height = containerHeight+'px';
         const canvas = await this.$html2canvas(document.querySelector('.ol-unselectable'));
+        let extent =  this.$refs.view.$view.calculateExtent();
+        let polygon = fromExtent(extent);
+        let format = new WKT();
+        let location = format.writeGeometry(polygon);
+        const formData = new FormData();
+        formData.append('location', location );
+        formData.append('image', this.image.id);
+        formData.append('slice', this.slice.id);
+        formData.append('width', this.image.width);
+        formData.append('height', this.image.height);
+        formData.append('snapshotName', snapshotName);
+        formData.append('domainClassName', this.image.class);
         canvas.toBlob(async (blob) => {
-          const file= new File([blob], imageName, { type: 'image/jpeg' });
-          let snapshotFile = new SnapshotFile({file: file, filename: imageName},this.imageWrapper.imageInstance).save();
-          await this.$emit(snapshotFile);
+          const file= new File([blob], snapshotName, { type: 'image/jpeg' });
+          formData.append('files[]', file);
+          let uploadData = await Cytomine.instance.api.post('/sliceSnapshot.json', formData);
+          await this.webhookSnapshot(snapshotName,canvas,uploadData,location);
         }, 'image/jpeg');
         document.querySelector('.map-container').style.height = '';
-        this.$notify({type: 'success', text: this.$t(`Success get snapshot ${imageName}`)});
-        await this.webhookSnapshot(imageName,canvas);
+        this.$notify({type: 'success', text: this.$t(`Success get snapshot ${snapshotName}`)});
       }
       catch (error){
         this.$notify({type: 'error', text: this.$t(`error: ${error}`)});
       }
     },
-    async webhookSnapshot(imageName,canvas){
+    async webhookSnapshot(imageName,canvas,uploadData,location){
       let webhookUrl = this.WebhookConfig.value;
       if(webhookUrl.length===0){
         return;
-      }
-      let snapshotID = '';
-      let snapshotURL;
-      for (let i = 0; i < 10; i++) {
-        await new Promise((resolve) => {
-          setTimeout(resolve, 200);
-        }).then(result =>{
-          console.log(result);
-        }).catch(error=>{
-          console.log(error);
-        });
-        this.snapshotFiles = (await SnapshotFileCollection.fetchAll({object: this.image})).array;
-        for (let i = 0; i < this.snapshotFiles.length; i++) {
-          let file = this.snapshotFiles[i];
-          if (file.filename === imageName) {
-            snapshotID = file.id.toString();
-            snapshotURL = this.host + file.url;
-          }
-        }
-        if(snapshotID.length > 0){
-          break;
-        }
       }
       const urls = webhookUrl.split(';');
       for (let i = 0; i < urls.length; i++) {
@@ -850,13 +836,15 @@ export default {
             thunmbnail:this.image.previewURL()
           },
           snapshot: {
-            id: snapshotID,
-            URL: snapshotURL,
+            id: uploadData.data.id,
+            url: this.host + uploadData.data.url,
+            previewURL: this.host + `/#/project/${this.project.id}/image/${this.image.id}/snapshot/${location}`,
             pxLeft: canvas.height.toString()+'px',
             pxTop: canvas.width.toString()+'px',
           },
           sendUrl: url,
         };
+
         try {
           let data = await Cytomine.instance.api.post('/webhook.json', project);
           this.$notify({type: 'success', text: data.data});

@@ -131,6 +131,9 @@ const props = {
   },
   annotationDrawLineColor: {
     type: String,
+  },
+  activeTool: {
+    type: String,
   }
 };
 const computed = {
@@ -181,7 +184,7 @@ const methods = {
    * @protected
    */
   getDefaultStyles () {
-    const defaultStyles = mapValues(defaultEditStyle(this.computedLineColor), styles => styles.map(createStyle));
+    const defaultStyles = mapValues(defaultEditStyle(this.computedLineColor,this.activeTool), styles => styles.map(createStyle));
     return function __selectDefaultStyleFunc (feature) {
       if (feature.getGeometry()) {
         return defaultStyles[feature.getGeometry().getType()];
