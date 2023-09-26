@@ -257,7 +257,7 @@ import SelectInteraction from './interactions/SelectInteraction';
 import DrawInteraction from './interactions/DrawInteraction';
 import ModifyInteraction from './interactions/ModifyInteraction';
 
-import {addProj, createProj, getProj} from 'vuelayers-c/lib/ol-ext';
+import {addProj, createProj, getProj} from 'vuelayers/lib/ol-ext';
 
 import View from 'ol/View';
 import OverviewMap from 'ol/control/OverviewMap';
@@ -970,7 +970,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import '~vuelayers-c/lib/style.css';
+@import '~vuelayers/lib/style.css';
 
 $backgroundPanelBar: #555;
 $widthPanelBar: 2.8rem;

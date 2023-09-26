@@ -1,4 +1,4 @@
-import { GEOMETRY_TYPE } from 'vuelayers-c/src/ol-ext/consts';
+import { GEOMETRY_TYPE } from 'vuelayers/src/ol-ext/consts';
 
 /**
  * @return {Object<GEOMETRY_TYPE, VlStyle[]>}

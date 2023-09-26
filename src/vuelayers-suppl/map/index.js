@@ -1,6 +1,5 @@
-
 import { pick } from 'vuelayers/lib/util/minilo';
-import Interaction from './interaction.vue';
+import View from './view.vue';
 
 function plugin (Vue, options = {}) {
   if (plugin.installed) {
@@ -9,14 +8,14 @@ function plugin (Vue, options = {}) {
   plugin.installed = true;
 
   options = pick(options, 'dataProjection');
-  Object.assign(Interaction, options);
+  Object.assign(View, options);
 
-  Vue.component(Interaction.name, Interaction);
+  Vue.component(View.name, View);
 }
 
 export default plugin;
 
 export {
-  Interaction,
+  View,
   plugin as install,
 };
