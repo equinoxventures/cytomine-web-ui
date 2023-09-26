@@ -15,12 +15,12 @@
 <script>
 /** @module translate-interaction/interaction */
 import TranslateInteraction from 'ol/interaction/Translate';
-import observableFromOlEvent from 'vuelayers-c/lib/rx-ext/from-ol-event';
-import interaction from 'vuelayers-c/lib/mixin/interaction';
-import { isCollection } from 'vuelayers-c/lib/ol-ext/util';
-import { isFunction } from 'vuelayers-c/lib/util/minilo';
-import { hasInteraction } from 'vuelayers-c/lib/util/assert';
-import { makeWatchers } from 'vuelayers-c/lib/util/vue-helpers';
+import observableFromOlEvent from 'vuelayers/lib/rx-ext/from-ol-event';
+import interaction from 'vuelayers/lib/mixin/interaction';
+import { isCollection } from 'vuelayers/lib/ol-ext/util';
+import { isFunction } from 'vuelayers/lib/util/minilo';
+import { hasInteraction } from 'vuelayers/lib/util/assert';
+import { makeWatchers } from 'vuelayers/lib/util/vue-helpers';
 
 /**
  * @vueProps
