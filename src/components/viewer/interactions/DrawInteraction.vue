@@ -111,6 +111,7 @@ export default {
     WebhookConfig:Object,
     MillimeterConfig:Object,
     map: Object,
+    drawing: Boolean,
   },
   data() {
     return {
@@ -121,6 +122,7 @@ export default {
       mouseEndDrawn: false,
       items: [],
       DrawingLines: false,
+      undoTime: 0
     };
 
   },
@@ -158,7 +160,10 @@ export default {
           lineShowLength: this.computeShowLength(Math.sqrt(deltaX * deltaX + deltaY * deltaY).toFixed(2)),
         });
       }
-      if (this.items.length > items.length){
+      if(this.undoTime > 0){
+        this.updateUndoTime(0);
+      }
+      else if (this.items.length > items.length){
         return this.items;
       }
       this.updateItems(items);
@@ -380,6 +385,12 @@ export default {
   },
 
   methods: {
+    updateUndoTime(times){
+      this.undoTime = times;
+    },
+    updateDrawing(newDrawing) {
+      this.$emit('update:drawing', newDrawing);
+    },
     updateItems(items){
       this.items = items;
     },
@@ -412,7 +423,9 @@ export default {
       this.startPoint=this.mousePosition;
       this.items = [];
       this.DrawingLines = true;
+      this.undoTime = 0;
       this.mouseEndDrawn = false;
+      this.updateDrawing(true);
     },
     clearDrawnFeatures() {
       this.$refs.olSourceDrawTarget.clear();
@@ -421,6 +434,7 @@ export default {
     async drawEndHandler({feature}) {
       this.DrawingLines = false;
       this.mouseEndDrawn = true;
+      this.updateDrawing(false);
       if(this.activeTool === 'draw-snapshot'){
         if(this.nbActiveLayers > 0){
           await this.endDrawSnapshot(feature);
@@ -533,8 +547,22 @@ export default {
 
     },
     shortkeyHandler(key) {
-      if(key === 'tool-finish-line'){
-        this.$refs.olDrawInteraction.$interaction.finishDrawing();
+      switch(key) {
+        case 'tool-finish-line':
+          this.$refs.olDrawInteraction.$interaction.finishDrawing();
+          return;
+        case 'tool-undo':
+          if(this.activeTool === 'line' && this.nowCoordinates.length > 0){
+            this.$refs.olDrawInteraction.$interaction.removeLastPoint();
+            this.updateUndoTime(1);
+            if(this.nowCoordinates.length === 1){
+              this.$refs.olDrawInteraction.$interaction.removeLastPoint();
+              this.DrawingLines = false;
+              this.updateDrawing(false);
+            }
+
+            return;
+          }
       }
     },
     async endDraw(drawnFeature) {

@@ -68,7 +68,8 @@
 
       <select-interaction v-if="activeSelectInteraction" :index="index" />
       <draw-interaction v-if="activeDrawInteraction" :index="index" :mousePosition="projectedMousePosition" :zoom="zoom" :map="this.$refs.map"
-                        :AnnotationLineColorConfig="AnnotationLineColorConfig" :WebhookConfig="WebhookConfig" :MillimeterConfig="MillimeterConfig"/>
+                        :AnnotationLineColorConfig="AnnotationLineColorConfig" :WebhookConfig="WebhookConfig" :MillimeterConfig="MillimeterConfig"
+                        :drawing="drawing" @update:drawing="drawing = $event"/>
       <modify-interaction v-if="activeModifyInteraction" :index="index" />
 
     </vl-map>
@@ -130,7 +131,7 @@
 
 
     <div v-if="configUI['project-tools-main']" class="draw-tools">
-      <draw-tools :index="index" @screenshot="takeScreenshot()" @snapshot="takeSnapshot()"/>
+      <draw-tools :index="index" :drawing="drawing" @screenshot="takeScreenshot()" @snapshot="takeSnapshot()"/>
     </div>
 
     <div class="panels">
@@ -315,6 +316,7 @@ export default {
       loading: true,
       overview: null,
       format: new WKT(),
+      drawing: false,
       WebhookConfig: new Configuration({key: constants.CONFIG_KEY_WEBHOOK_URL, value: '', readingRole: 'all'}),
       ScrollZoomConfig: new Configuration({key: constants.CONFIG_KEY_SCROLL_ZOOM, value: '', readingRole: 'all'}),
       AnnotationLineColorConfig: new Configuration({key: constants.CONFIG_KEY_ANNOTATION_LINE_COLOR, value: '', readingRole: 'all'}),

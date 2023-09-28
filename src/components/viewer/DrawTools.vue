@@ -430,7 +430,8 @@ export default {
     IconLineFreeHand
   },
   props: {
-    index: String
+    index: String,
+    drawing: Boolean,
   },
   data() {
     return {
@@ -772,6 +773,11 @@ export default {
 
 
     async undo() {
+      console.log(this.drawing);
+
+      if(this.drawing){
+        return;
+      }
       if(this.actions.length === 0) {
         return;
       }
