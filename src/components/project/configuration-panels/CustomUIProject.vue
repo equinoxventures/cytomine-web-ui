@@ -59,7 +59,8 @@ import {get} from '@/utils/store-helpers';
 
 import IconPolygonFreeHand from '@/components/icons/IconPolygonFreeHand';
 import IconLineFreeHand from '@/components/icons/IconLineFreeHand';
-
+import IconUnitCircle from '@/components/icons/iconUnitCircle.vue';
+import IconUnitSquare from '@/components/icons/iconUnitSquare.vue';
 export default {
   name: 'custom-ui-project',
   data() {
@@ -147,6 +148,12 @@ export default {
             {key: 'project-tools-polygon', label: 'polygon', icon: 'fas fa-draw-polygon', parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-freehand-polygon', label: 'freehand-polygon',
               iconComponent: IconPolygonFreeHand, parentConfiguration: 'project-tools-main'},
+
+            {key: 'project-tools-1mm^2-circle', label: '1mm^2-circle',
+              iconComponent: IconUnitCircle,parentConfiguration: 'project-tools-main'},
+            {key: 'project-tools-1mm^2-square', label: '1mm^2-square',
+              iconComponent: IconUnitSquare,parentConfiguration: 'project-tools-main'},
+
             {key: 'project-tools-screenshot', label: 'screenshot', icon: 'fas fa-camera', parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-snapshot', label: 'snapshot', icon: 'fas fa-image', parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-draw-snapshot', label: 'draw-snapshot', icon: 'fas fa-expand', parentConfiguration: 'project-tools-main'},
