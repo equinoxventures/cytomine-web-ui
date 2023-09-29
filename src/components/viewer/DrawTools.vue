@@ -144,6 +144,8 @@
         <span class="icon is-small"><i class="far fa-square"></i></span>
       </button>
 
+
+
       <button
         v-if="isToolDisplayed('circle')"
         :disabled="disabledDraw"
@@ -154,7 +156,6 @@
       >
         <span class="icon is-small"><i class="far fa-circle"></i></span>
       </button>
-
       <button
         v-if="isToolDisplayed('polygon')"
         :disabled="disabledDraw"
@@ -179,6 +180,27 @@
         </span>
       </button>
     </div>
+    <div class="buttons has-addons are-small">
+      <button
+        v-if="isToolDisplayed('1mm^2-square')"
+        :disabled="disabledDraw"
+        v-tooltip="$t('1mm x 1mm square')"
+        class="button"
+        @click="drawSquare('1mm^2-square')"
+      >
+        <span class="icon is-small"><i class="far fa-square"></i><span class="icon-number">1</span></span>
+      </button>
+      <button
+        v-if="isToolDisplayed('1mm^2-circle')"
+        :disabled="disabledDraw"
+        v-tooltip="$t('1mm^2 circle')"
+        class="button"
+        @click="drawCircle()"
+      >
+        <span class="icon is-small"><i class="far fa-circle"></i><span class="icon-number">1</span></span>
+      </button>
+    </div>
+
   </template>
 
   <template v-else>
@@ -572,7 +594,13 @@ export default {
     },
     maxRepeats() {
       return this.maxRank - this.slice.rank - 1;
-    }
+    },
+    activeLayers() {
+      return this.layers.filter(layer => layer.drawOn);
+    },
+    nbActiveLayers() {
+      return this.activeLayers.length;
+    },
   },
   watch: {
     noActiveLayer(value) {
@@ -593,6 +621,80 @@ export default {
     }
   },
   methods: {
+
+    async drawCircle(){
+      let location = this.createWKTCircle(this.imageWrapper.view.center,Math.sqrt(1 / Math.PI));
+      await this.drawLocation(location);
+    },
+    async drawSquare(){
+      let location = this.createWKTSquare(this.imageWrapper.view.center,1);
+      await this.drawLocation(location);
+    },
+    async drawLocation(location) {
+      for (const [idx, layer] of this.activeLayers.entries()) {
+        let annot = new Annotation({
+          location: location,
+          image: this.image.id,
+          slice: this.slice.id,
+          user: layer.id,
+          term: this.termsToAssociate,
+          track: this.tracksToAssociate
+        });
+        try {
+          await annot.save();
+          annot.userByTerm = this.termsToAssociate.map(term => ({term, user: [this.currentUser.id]}));
+          this.$eventBus.$emit('addAnnotation', annot);
+          if(idx === this.nbActiveLayers - 1) {
+            this.$eventBus.$emit('selectAnnotation', {index: this.index, annot});
+          }
+          this.$store.commit(this.imageModule + 'addAction', {annot, type: Action.CREATE});
+        }
+        catch(err) {
+          console.log(err);
+          this.$notify({type: 'error', text: this.$t('notif-error-annotation-creation')});
+        }
+      }
+    },
+
+    createWKTCircle(center, mmRadius){
+      let resolution = this.image.physicalSizeX ? this.image.physicalSizeX : 1;
+      let pixelRadius = mmRadius / resolution * 1000;
+      let numPoints = 36;
+      let wkt = 'POLYGON((';
+      for (let i = 0; i <= numPoints; i++) {
+        let angle = Math.PI * 2 * i / numPoints;
+        let dx = pixelRadius * Math.cos(angle);
+        let dy = pixelRadius * Math.sin(angle);
+        let pointX = center[0] + dx;
+        let pointY = center[1] + dy;
+        wkt += pointX + ' ' + pointY;
+        if (i < numPoints) {
+          wkt += ', ';
+        }
+      }
+      wkt += '))';
+      return wkt;
+    },
+    createWKTSquare(center, mmSideLength) {
+      let resolution = this.image.physicalSizeX ? this.image.physicalSizeX : 1;
+      let pixelSideLength = mmSideLength / resolution * 1000;
+      let halfPixelSideLength = pixelSideLength / 2;
+
+      let topLeft = [center[0] - halfPixelSideLength, center[1] - halfPixelSideLength];
+      let topRight = [center[0] + halfPixelSideLength, center[1] - halfPixelSideLength];
+      let bottomRight = [center[0] + halfPixelSideLength, center[1] + halfPixelSideLength];
+      let bottomLeft = [center[0] - halfPixelSideLength, center[1] + halfPixelSideLength];
+
+      let wkt = 'POLYGON((';
+      wkt += `${topLeft[0]} ${topLeft[1]}, `;
+      wkt += `${topRight[0]} ${topRight[1]}, `;
+      wkt += `${bottomRight[0]} ${bottomRight[1]}, `;
+      wkt += `${bottomLeft[0]} ${bottomLeft[1]}, `;
+      wkt += `${topLeft[0]} ${topLeft[1]}`; // Close the polygon by going back to the first point
+      wkt += '))';
+
+      return wkt;
+    },
     isToolDisplayed(tool) {
       return this.configUI[`project-tools-${tool}`];
 
@@ -773,12 +875,7 @@ export default {
 
 
     async undo() {
-      console.log(this.drawing);
-
-      if(this.drawing){
-        return;
-      }
-      if(this.actions.length === 0) {
+      if(this.drawing || this.actions.length === 0) {
         return;
       }
 
@@ -1141,7 +1238,23 @@ export default {
 
 <style lang="scss">
 $colorActiveIcon: #fff;
+.icon-container {
+  position: relative;
+  display: inline-block;
+}
 
+.icon.is-small {
+  font-size: 1rem; /* adjust as needed to increase the size of the circle */
+}
+
+
+.icon-number {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.8em; /* adjust as needed */
+}
 .draw-tools-wrapper {
   .special-paste-selection .special-paste-container {
     p {
