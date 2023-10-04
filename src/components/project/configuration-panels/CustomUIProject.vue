@@ -141,6 +141,7 @@ export default {
 
             {key: 'project-tools-point', label: 'point', icon: 'fas fa-map-pin', parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-line', label: 'line', icon: 'fas fa-minus', parentConfiguration: 'project-tools-main'},
+            {key: 'project-tools-arrow', label: 'Arrow', icon: 'fas fa-arrow-right', parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-freehand-line', label: 'freehand-line',
               iconComponent: IconLineFreeHand, parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-rectangle', label: 'rectangle', icon: 'far fa-square', parentConfiguration: 'project-tools-main'},

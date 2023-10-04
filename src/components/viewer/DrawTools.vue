@@ -115,6 +115,17 @@
       </button>
 
       <button
+        v-if="isToolDisplayed('arrow')"
+        :disabled="disabledDraw"
+        v-tooltip="$t('Arrow')"
+        class="button"
+        :class="{'is-selected': activeTool === 'arrow'}"
+        @click="activateTool('arrow')"
+      >
+        <span class="icon is-small"><i class="fas fa-arrow-right"></i></span>
+      </button>
+
+      <button
         v-if="isToolDisplayed('freehand-line')"
         :disabled="disabledDraw"
         v-tooltip="$t('freehand-line')"
