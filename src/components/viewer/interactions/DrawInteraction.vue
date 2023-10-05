@@ -83,6 +83,7 @@
     :geometry-function="drawGeometryFunction"
     :annotationDrawLineColor="AnnotationLineColorConfig.value"
     :activeTool="activeTool"
+    :max-points="maxPoint"
     @drawend="drawEndHandler"
     @drawstart="drawStart"
   />
@@ -122,7 +123,8 @@ export default {
       mouseEndDrawn: false,
       items: [],
       DrawingLines: false,
-      undoTime: 0
+      undoTime: 0,
+      maxPoint:undefined,
     };
 
   },
@@ -277,6 +279,7 @@ export default {
       return this.imageWrapper.activeSlice;
     },
     activeTool() {
+      this.updateDrawMaxPoint(this.imageWrapper.draw.activeTool === 'arrow');
       return this.imageWrapper.draw.activeTool;
     },
     activeEditTool() {
@@ -293,6 +296,7 @@ export default {
         case 'point':
           return 'Point';
         case 'line':
+        case 'arrow':
         case 'freehand-line':
           return 'LineString';
         case 'rectangle':
@@ -335,10 +339,10 @@ export default {
             return geometry;
           };
         case 'line':
+        case 'arrow':
           return (coordinates, geometry) => {
             this.nowCoordinates = coordinates;
             if(geometry) {
-
               geometry.setCoordinates(coordinates);
             }
             else {
@@ -385,6 +389,9 @@ export default {
   },
 
   methods: {
+    updateDrawMaxPoint(arrow){
+      this.maxPoint = arrow ? 2 : undefined;
+    },
     updateUndoTime(times){
       this.undoTime = times;
     },
@@ -566,9 +573,15 @@ export default {
       }
     },
     async endDraw(drawnFeature) {
-      this.activeLayers.forEach(async (layer, idx) => {
+      for (const layer of this.activeLayers) {
+        const idx = this.activeLayers.indexOf(layer);
+        let location = this.getWktLocation(drawnFeature).toString();
+        if(this.activeTool === 'arrow'){
+          location = this.addArrow(location);
+        }
+
         let annot = new Annotation({
-          location: this.getWktLocation(drawnFeature),
+          location: location,
           image: this.image.id,
           slice: this.slice.id,
           user: layer.id,
@@ -580,7 +593,7 @@ export default {
           await annot.save();
           annot.userByTerm = this.termsToAssociate.map(term => ({term, user: [this.currentUser.id]}));
           this.$eventBus.$emit('addAnnotation', annot);
-          if(idx === this.nbActiveLayers - 1) {
+          if(idx === this.nbActiveLayers - 1 && this.activeTool !== 'arrow') {
             this.$eventBus.$emit('selectAnnotation', {index: this.index, annot});
           }
           this.$store.commit(this.imageModule + 'addAction', {annot, type: Action.CREATE});
@@ -589,7 +602,7 @@ export default {
           console.log(err);
           this.$notify({type: 'error', text: this.$t('notif-error-annotation-creation')});
         }
-      });
+      }
     },
 
     async endCorrection(feature) {
@@ -617,7 +630,29 @@ export default {
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-correction')});
       }
     },
+    addArrow(location){
+      let locationArray = location.replace('LINESTRING(', '').replace(')', '').split(',').map(function(point){
+        return point.trim().split(' ').map(Number);
+      });
 
+      let dx = locationArray[1][0] - locationArray[0][0];
+      let dy = locationArray[1][1] - locationArray[0][1];
+
+      let frac = 0.1; // control arrow size
+      let distant = 0.4;
+      let arrowLength = 0.8;
+      let arrow1 = [locationArray[1][0] - frac * (dx * arrowLength - dy * distant), locationArray[1][1] - frac * (dy * arrowLength + dx * distant)];
+      let arrow2 = [locationArray[1][0] - frac * (dx * arrowLength + dy * distant), locationArray[1][1] - frac * (dy * arrowLength - dx * distant)];
+      let arrowMid = [((arrow1[0] + arrow2[0]) / 2 + locationArray[1][0])/2,((arrow1[1] + arrow2[1]) / 2 + locationArray[1][1])/2];
+      return 'LINESTRING('
+        + locationArray[0].join(' ') + ', '
+        + locationArray[1].join(' ') + ', '
+        + arrow1.join(' ') + ', '
+        + arrowMid.join(' ') + ', '
+        + arrow2.join(' ') + ', '
+        + locationArray[1].join(' ')
+        + ')';
+    },
     getWktLocation(feature) {
       // transform circle to circular polygon
       let geometry = feature.getGeometry();
