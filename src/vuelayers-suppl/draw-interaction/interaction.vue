@@ -134,7 +134,11 @@ const props = {
   },
   activeTool: {
     type: String,
-  }
+  },
+  active: {
+    type: Boolean,
+    default: true,
+  },
 };
 const computed = {
   computedLineColor() {
@@ -243,9 +247,17 @@ const methods = {
 
 };
 // todo other props?
-const watch = makeWatchers(['source', 'type'], () => function () {
-  this.scheduleRecreate();
-});
+const watch = {
+  ...makeWatchers(['source', 'type'], () => function () {
+    this.scheduleRecreate();
+  }),
+  active: function (newVal) {
+    if (newVal) {
+      this.scheduleRecreate();
+    }
+  }
+};
+
 
 /**
  * @alias module:draw-interaction/interaction

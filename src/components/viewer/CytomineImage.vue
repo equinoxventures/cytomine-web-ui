@@ -15,7 +15,7 @@
 <template>
 <div class="map-container" @click="isActiveImage = true" ref="container">
   <template v-if="!loading && zoom !== null">
-    <vl-map
+    <vl-map @click.native="handClick"
       :data-projection="projectionName"
       :load-tiles-while-animating="true"
       :load-tiles-while-interacting="true"
@@ -69,7 +69,7 @@
       <select-interaction v-if="activeSelectInteraction" :index="index" />
       <draw-interaction v-if="activeDrawInteraction" :index="index" :mousePosition="projectedMousePosition" :zoom="zoom" :map="this.$refs.map"
                         :AnnotationLineColorConfig="AnnotationLineColorConfig" :WebhookConfig="WebhookConfig" :MillimeterConfig="MillimeterConfig"
-                        :drawing="drawing" @update:drawing="drawing = $event"/>
+                        :drawing="drawing" @update:drawing="drawing = $event" :ignoreDraw="ignoreDraw" @update:ignoreDraw="ignoreDraw = $event"/>
       <modify-interaction v-if="activeModifyInteraction" :index="index" />
 
     </vl-map>
@@ -317,6 +317,7 @@ export default {
       overview: null,
       format: new WKT(),
       drawing: false,
+      ignoreDraw:false,
       WebhookConfig: new Configuration({key: constants.CONFIG_KEY_WEBHOOK_URL, value: '', readingRole: 'all'}),
       ScrollZoomConfig: new Configuration({key: constants.CONFIG_KEY_SCROLL_ZOOM, value: '', readingRole: 'all'}),
       AnnotationLineColorConfig: new Configuration({key: constants.CONFIG_KEY_ANNOTATION_LINE_COLOR, value: '', readingRole: 'all'}),
@@ -512,6 +513,9 @@ export default {
     }
   },
   methods: {
+    handClick(){
+      this.ignoreDraw=false;
+    },
     setInitialZoom() {
       if(this.zoom !== null) {
         return; // not the first time the viewer is opened => zoom was already initialized
