@@ -559,7 +559,7 @@ export default {
     shortkeyHandler(key) {
       switch(key) {
         case 'tool-finish-line':
-          if(this.drawing && this.drawing && ['rectangle', 'circle'].includes(this.activeTool)){
+          if(this.drawing && this.drawing && ['rectangle', 'circle', 'freehand-polygon', 'freehand-line'].includes(this.activeTool)){
             this.$emit('update:ignoreDraw', true);
             this.$refs.olDrawInteraction.$interaction.abortDrawing_();
             this.startPoint=[0,0];
