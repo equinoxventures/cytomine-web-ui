@@ -84,6 +84,7 @@
     :annotationDrawLineColor="AnnotationLineColorConfig.value"
     :activeTool="activeTool"
     :max-points="maxPoint"
+    :active="!ignoreDraw"
     @drawend="drawEndHandler"
     @drawstart="drawStart"
   />
@@ -113,6 +114,8 @@ export default {
     MillimeterConfig:Object,
     map: Object,
     drawing: Boolean,
+    ignoreDraw: Boolean,
+
   },
   data() {
     return {
@@ -556,7 +559,15 @@ export default {
     shortkeyHandler(key) {
       switch(key) {
         case 'tool-finish-line':
-          this.$refs.olDrawInteraction.$interaction.finishDrawing();
+          if(this.drawing && this.drawing && ['rectangle', 'circle', 'freehand-polygon', 'freehand-line'].includes(this.activeTool)){
+            this.$emit('update:ignoreDraw', true);
+            this.$refs.olDrawInteraction.$interaction.abortDrawing_();
+            this.startPoint=[0,0];
+            this.updateDrawing(false);
+          }
+          else {
+            this.$refs.olDrawInteraction.$interaction.finishDrawing();
+          }
           return;
         case 'tool-undo':
           if(this.activeTool === 'line' && this.nowCoordinates.length > 0){
