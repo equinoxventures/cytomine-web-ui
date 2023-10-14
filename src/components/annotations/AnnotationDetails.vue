@@ -35,6 +35,12 @@
           <td><strong>{{$t(annotation.area > 0 ? 'perimeter' : 'length')}}</strong></td>
           <td>{{ `${annotation.perimeter.toFixed(3)} ${annotation.perimeterUnit}` }}</td>
         </tr>
+        <tr v-if="isCanShowMeasurements">
+          <td><strong>{{$t('Show dimensions')}}</strong></td>
+          <td>
+            <input type="checkbox" id="showDimensions" v-model="isChecked" @change="toggleAnnot">
+          </td>
+        </tr>
       </template>
 
       <tr v-if="isPropDisplayed('description')">
@@ -229,6 +235,7 @@ import OntologyTree from '@/components/ontology/OntologyTree';
 import TrackTree from '@/components/track/TrackTree';
 import CytomineTrack from '@/components/track/CytomineTrack';
 import AnnotationCommentsModal from './AnnotationCommentsModal';
+import WKT from 'ol/format/WKT';
 
 export default {
   name: 'annotations-details',
@@ -249,6 +256,7 @@ export default {
     tracks: {type: Array},
     users: {type: Array},
     images: {type: Array},
+    index: String,
     showImageInfo: {type: Boolean, default: true},
     showComments: {type: Boolean, default: false}
   },
@@ -261,6 +269,7 @@ export default {
       comments: null,
       revTerms: 0,
       revTracks: 0,
+      format: new WKT(),
     };
   },
   computed: {
@@ -331,8 +340,25 @@ export default {
     availableTracks() {
       return this.tracks.filter(track => track.image === this.annotation.image);
     },
+    imageModule() {
+      return this.$store.getters['currentProject/imageModule'](this.index);
+    },
+    isChecked() {
+      return !!this.$store.getters[this.imageModule+'showMeasurements'][this.annotation.id];
+    },
+    isCanShowMeasurements(){
+      return ['rectangle', 'circle', 'line'].includes(this.annotation.geometry);
+    }
   },
   methods: {
+    toggleAnnot() {
+      if (this.$store.getters[this.imageModule+'showMeasurements'][this.annotation.id]) {
+        this.$store.commit(this.imageModule+'removeAnnot', this.annotation);
+      }
+      else {
+        this.$store.commit(this.imageModule+'addAnnot', this.annotation);
+      }
+    },
     isPropDisplayed(prop) {
       return this.configUI[`project-explore-annotation-${prop}`];
     },
@@ -344,8 +370,8 @@ export default {
 
     async newTerm(term) { // a new term was added to the ontology
       this.$emit('addTerm', term);
-      this.$store.dispatch('currentProject/fetchOntology');
-      this.addTerm(term.id);
+      await this.$store.dispatch('currentProject/fetchOntology');
+      await this.addTerm(term.id);
     },
 
     async addTerm(idTerm) {
@@ -455,14 +481,17 @@ export default {
     async deleteAnnot() {
       try {
         await this.annotation.delete();
+        this.$store.commit(this.imageModule+'removeAnnot', this.annotation);
         this.$emit('deletion');
       }
       catch(err) {
         this.$notify({type: 'error', text: this.$t('notif-error-annotation-deletion')});
       }
-    },
+    }
   },
+
   async created() {
+
     if(this.isPropDisplayed('comments') && [AnnotationType.ALGO, AnnotationType.USER].includes(this.annotation.type)) {
       try {
         this.comments = (await AnnotationCommentCollection.fetchAll({annotation: this.annotation})).array;

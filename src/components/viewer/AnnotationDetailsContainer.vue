@@ -45,6 +45,7 @@
         :users="allUsers"
         :showImageInfo="false"
         :key="selectedFeature.id"
+        :index="index"
         :showComments="showComments"
         @addTerm="$emit('addTerm', $event)"
         @addTrack="$emit('addTrack', $event)"
@@ -69,7 +70,7 @@ import {fullName} from '@/utils/user-utils.js';
 
 export default {
   name: 'annotations-details-container',
-  components: {VueDraggableResizable, AnnotationDetails},
+  components: { VueDraggableResizable, AnnotationDetails},
   props: {
     index: String,
   },
@@ -145,6 +146,7 @@ export default {
     }
   },
   methods: {
+
     async fetchUsers() {
       let collection = new UserCollection({
         filterKey: 'project',

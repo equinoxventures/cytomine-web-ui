@@ -59,6 +59,17 @@
         />
       </vl-layer-image>
 
+      <template v-for="(showMeasurementsAnnot) in showMeasurementsAnnots">
+        <show-dimension
+          :key="showMeasurementsAnnot.id"
+          :image="image"
+          :annotation="showMeasurementsAnnot"
+          :magnification="magnification"
+          :MillimeterConfig="MillimeterConfig"
+        >
+        </show-dimension>
+      </template>
+
       <annotation-layer
         v-for="layer in selectedLayers"
         :key="'layer-'+layer.id"
@@ -67,9 +78,10 @@
       />
 
       <select-interaction v-if="activeSelectInteraction" :index="index" />
-      <draw-interaction v-if="activeDrawInteraction" :index="index" :mousePosition="projectedMousePosition" :zoom="zoom" :map="this.$refs.map"
+      <draw-interaction v-if="activeDrawInteraction" :index="index" :mousePosition="projectedMousePosition" :zoom="zoom"
                         :AnnotationLineColorConfig="AnnotationLineColorConfig" :WebhookConfig="WebhookConfig" :MillimeterConfig="MillimeterConfig"
-                        :drawing="drawing" @update:drawing="drawing = $event" :ignoreDraw="ignoreDraw" @update:ignoreDraw="ignoreDraw = $event"/>
+                        :drawing="drawing" @update:drawing="drawing = $event" :ignoreDraw="ignoreDraw" @update:ignoreDraw="ignoreDraw = $event"
+                        @endDrawSnapshot="endDrawSnapshot"/>
       <modify-interaction v-if="activeModifyInteraction" :index="index" />
 
     </vl-map>
@@ -223,7 +235,7 @@
 
     <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition" />
 
-    <annotations-container :index="index" @centerView="centerViewOnAnnot" />
+    <annotations-container :index="index" @centerView="centerViewOnAnnot" @showDimensions="showDimensions"/>
 
     <div class="custom-overview" ref="overview">
     </div>
@@ -257,6 +269,7 @@ import ReviewPanel from './panels/ReviewPanel';
 import SelectInteraction from './interactions/SelectInteraction';
 import DrawInteraction from './interactions/DrawInteraction';
 import ModifyInteraction from './interactions/ModifyInteraction';
+import ShowDimension from './ShowDimension.vue';
 
 import {addProj, createProj, getProj} from 'vuelayers/lib/ol-ext';
 
@@ -273,7 +286,8 @@ import {constLib, operation} from '@/utils/color-manipulation.js';
 import constants from '@/utils/constants.js';
 import {Configuration,Cytomine} from 'cytomine-client-c';
 import CustomMouseWheelZoom from '@/components/viewer/newModuls/CustomMouseWheelZoom';
-import {fromExtent} from 'ol/geom/Polygon';
+import {fromCircle as polygonFromCircle, fromExtent} from 'ol/geom/Polygon';
+import {getBottomRight, getTopLeft} from 'ol/extent';
 
 
 export default {
@@ -282,15 +296,12 @@ export default {
     index: String
   },
   components: {
-
     AnnotationLayer,
-
     RotationSelector,
     ScaleLine,
     DrawTools,
     ImageControls,
     AnnotationsContainer,
-
     InformationPanel,
     DigitalZoom,
     ColorManipulation,
@@ -300,10 +311,10 @@ export default {
     PropertiesPanel,
     FollowPanel,
     ReviewPanel,
-
     SelectInteraction,
     DrawInteraction,
-    ModifyInteraction
+    ModifyInteraction,
+    ShowDimension,
   },
   data() {
     return {
@@ -500,17 +511,18 @@ export default {
         idealZoom --;
       }
       return idealZoom;
-    }
+    },
+    showMeasurementsAnnots(){
+      return this.$store.getters[this.imageModule+'showMeasurements'];
+    },
   },
   watch: {
     viewState() {
       this.savePosition();
-
-
     },
     overviewCollapsed(value) {
       this.$store.commit(this.imageModule + 'setOverviewCollapsed', value);
-    }
+    },
   },
   methods: {
     handClick(){
@@ -650,7 +662,7 @@ export default {
     },
 
     async centerViewOnAnnot(annot, duration) {
-
+      annot = await Annotation.fetch(annot.id);
       if (annot.image === this.image.id) {
         if (!annot.location) {
           //in case annotation location has not been loaded
@@ -775,50 +787,92 @@ export default {
       document.querySelector('.map-container').style.height = containerHeight+'px';
 
       let a = document.createElement('a');
-      a.href = await this.$html2canvas(document.querySelector('.ol-unselectable'), {type: 'dataURL'});
+      a.href = await this.$html2canvas(document.querySelector('.vl-map'), {type: 'dataURL'});
       let imageName = 'image_' + this.image.id.toString() + '_project_' + this.image.project.toString() + '.png';
       a.download = imageName;
       a.click();
       document.querySelector('.map-container').style.height = '';
     },
+
     async takeSnapshot() {
       try {
-        const date = new Date();
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        const hours = String(date.getHours()).padStart(2, '0');
-        const minutes = String(date.getMinutes()).padStart(2, '0');
-        const seconds = String(date.getSeconds()).padStart(2, '0');
-        let snapshotName = 'project_' + this.project.name +'_image_' + this.image.filename +
-          '__' +`${year}-${month}-${day}_${hours}:${minutes}:${seconds}`+'.jpg';
         let containerHeight = document.querySelector('.map-container').clientHeight;
         document.querySelector('.map-container').style.height = containerHeight+'px';
-        const canvas = await this.$html2canvas(document.querySelector('.ol-unselectable'));
+        const canvas = await this.$html2canvas(document.querySelector('.vl-map'));
         let extent =  this.$refs.view.$view.calculateExtent();
         let polygon = fromExtent(extent);
         let format = new WKT();
         let location = format.writeGeometry(polygon);
-        const formData = new FormData();
-        formData.append('location', location );
-        formData.append('image', this.image.id);
-        formData.append('slice', this.slice.id);
-        formData.append('width', this.image.width);
-        formData.append('height', this.image.height);
-        formData.append('snapshotName', snapshotName);
-        formData.append('domainClassName', this.image.class);
-        canvas.toBlob(async (blob) => {
-          const file= new File([blob], snapshotName, { type: 'image/jpeg' });
-          formData.append('files[]', file);
-          let uploadData = await Cytomine.instance.api.post('/sliceSnapshot.json', formData);
-          await this.webhookSnapshot(snapshotName,canvas,uploadData,location);
-        }, 'image/jpeg');
-        document.querySelector('.map-container').style.height = '';
-        this.$notify({type: 'success', text: this.$t(`Success get snapshot ${snapshotName}`)});
+
+        await this.createSnapshot(canvas, location);
       }
       catch (error){
         this.$notify({type: 'error', text: this.$t(`error: ${error}`)});
       }
+    },
+
+    async endDrawSnapshot(drawnFeature) {
+      try {
+        let location=this.getWktLocation(drawnFeature);
+        let geometry = this.format.readGeometry(location);
+        let extent = geometry.getExtent();
+        let topLeft = this.$refs.map.$map.getPixelFromCoordinate(getTopLeft(extent));
+        let bottomRight = this.$refs.map.$map.getPixelFromCoordinate(getBottomRight(extent));
+        let containerHeight = document.querySelector('.map-container').clientHeight;
+        document.querySelector('.map-container').style.height = containerHeight+'px';
+        const canvas = await this.$html2canvas(document.querySelector('.vl-map'));
+        let exportCanvas = document.createElement('canvas');
+        // Subtract 4 pixels (2 for top and 2 for bottom) from the height
+        exportCanvas.height = bottomRight[1] - topLeft[1] - 4;
+        // Subtract 4 pixels (2 for left and 2 for right) from the width
+        exportCanvas.width = bottomRight[0] - topLeft[0] - 4;
+        let context = exportCanvas.getContext('2d');
+        context.drawImage(
+          canvas,
+          topLeft[0] + 2, // Start 2 pixels to the right
+          topLeft[1] + 2, // Start 2 pixels down
+          bottomRight[0] - topLeft[0] - 4, // End 2 pixels before the right edge
+          bottomRight[1] - topLeft[1] - 4, // End 2 pixels before the bottom edge
+          0, 0,
+          bottomRight[0] - topLeft[0] - 4, // Width is 4 pixels less
+          bottomRight[1] - topLeft[1] - 4  // Height is 4 pixels less
+        );
+
+        await this.createSnapshot(exportCanvas, location);
+      }
+      catch (error){
+        this.$notify({type: 'error', text: this.$t(`error: ${error}`)});
+      }
+    },
+    async createSnapshot(canvas, location) {
+      const date = new Date();
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+      let snapshotName = 'project_' + this.project.name +'_image_' + this.image.filename +
+        '__' +`${year}-${month}-${day}_${hours}:${minutes}:${seconds}`+'.jpg';
+
+      const formData = new FormData();
+      formData.append('location', location);
+      formData.append('image', this.image.id);
+      formData.append('slice', this.slice.id);
+      formData.append('width', this.image.width);
+      formData.append('height', this.image.height);
+      formData.append('snapshotName', snapshotName);
+      formData.append('domainClassName', this.image.class);
+
+      canvas.toBlob(async (blob) => {
+        const file= new File([blob], snapshotName, { type: 'image/jpeg' });
+        formData.append('files[]', file);
+        let uploadData = await Cytomine.instance.api.post('/sliceSnapshot.json', formData);
+        await this.webhookSnapshot(snapshotName,canvas,uploadData,location);
+      }, 'image/jpeg');
+
+      document.querySelector('.map-container').style.height = '';
+      this.$notify({type: 'success', text: this.$t(`Success get snapshot ${snapshotName}`)});
     },
     async webhookSnapshot(imageName,canvas,uploadData,location){
       let webhookUrl = this.WebhookConfig.value;
@@ -860,6 +914,14 @@ export default {
         }
       }
 
+    },
+    getWktLocation(feature) {
+      // transform circle to circular polygon
+      let geometry = feature.getGeometry();
+      if (geometry.getType() === 'Circle') {
+        feature.setGeometry(polygonFromCircle(geometry));
+      }
+      return this.format.writeFeature(feature);
     },
   },
   async created() {
@@ -1215,4 +1277,5 @@ $colorActiveIcon: #fff;
   z-index: 40;
   pointer-events: none;
 }
+
 </style>

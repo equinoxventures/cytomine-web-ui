@@ -101,7 +101,6 @@ import {Annotation, AnnotationType, Cytomine} from 'cytomine-client-c';
 import {Action} from '@/utils/annotation-utils.js';
 import LineString from 'ol/geom/LineString';
 import Circle from 'ol/geom/Circle';
-import {getBottomRight, getTopLeft} from 'ol/extent';
 
 export default {
   name: 'draw-interaction',
@@ -112,7 +111,6 @@ export default {
     AnnotationLineColorConfig: Object,
     WebhookConfig:Object,
     MillimeterConfig:Object,
-    map: Object,
     drawing: Boolean,
     ignoreDraw: Boolean,
 
@@ -447,7 +445,7 @@ export default {
       this.updateDrawing(false);
       if(this.activeTool === 'draw-snapshot'){
         if(this.nbActiveLayers > 0){
-          await this.endDrawSnapshot(feature);
+          await this.$emit('endDrawSnapshot',feature);
         }
         this.clearDrawnFeatures();
         return;
@@ -460,101 +458,6 @@ export default {
       }
 
       this.clearDrawnFeatures();
-    },
-
-    async endDrawSnapshot(drawnFeature) {
-      try {
-        let location=this.getWktLocation(drawnFeature);
-        let geometry = this.format.readGeometry(location);
-        let extent = geometry.getExtent();
-        const date = new Date();
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        const hours = String(date.getHours()).padStart(2, '0');
-        const minutes = String(date.getMinutes()).padStart(2, '0');
-        const seconds = String(date.getSeconds()).padStart(2, '0');
-        let snapshotName = 'project_' + this.project.name +'_image_' + this.image.filename +
-          '__' +`${year}-${month}-${day}_${hours}:${minutes}:${seconds}`+'.jpg';
-        let topLeft = this.map.$map.getPixelFromCoordinate(getTopLeft(extent));
-        let bottomRight = this.map.$map.getPixelFromCoordinate(getBottomRight(extent));
-        let canvas = document.querySelector('.ol-viewport > canvas');
-        let exportCanvas = document.createElement('canvas');
-        // Subtract 4 pixels (2 for top and 2 for bottom) from the height
-        exportCanvas.height = bottomRight[1] - topLeft[1] - 4;
-        // Subtract 4 pixels (2 for left and 2 for right) from the width
-        exportCanvas.width = bottomRight[0] - topLeft[0] - 4;
-        let context = exportCanvas.getContext('2d');
-        context.drawImage(
-          canvas,
-          topLeft[0] + 2, // Start 2 pixels to the right
-          topLeft[1] + 2, // Start 2 pixels down
-          bottomRight[0] - topLeft[0] - 4, // End 2 pixels before the right edge
-          bottomRight[1] - topLeft[1] - 4, // End 2 pixels before the bottom edge
-          0, 0,
-          bottomRight[0] - topLeft[0] - 4, // Width is 4 pixels less
-          bottomRight[1] - topLeft[1] - 4  // Height is 4 pixels less
-        );
-        const formData = new FormData();
-        formData.append('location', location );
-        formData.append('image', this.image.id);
-        formData.append('slice', this.slice.id);
-        formData.append('width', this.image.width);
-        formData.append('height', this.image.height);
-        formData.append('snapshotName', snapshotName);
-        formData.append('domainClassName', this.image.class);
-        exportCanvas.toBlob(async (blob) => {
-          const file= new File([blob], snapshotName, { type: 'image/jpeg' });
-          formData.append('files[]', file);
-          let uploadData = await Cytomine.instance.api.post('/sliceSnapshot.json', formData);
-          await this.webhookSnapshot(snapshotName,exportCanvas,uploadData,location);
-        }, 'image/jpeg');
-        this.$notify({type: 'success', text: this.$t(`Success get snapshot ${snapshotName}`)});
-      }
-      catch (error){
-        this.$notify({type: 'error', text: this.$t(`error: ${error}`)});
-      }
-    },
-    async webhookSnapshot(imageName,canvas,uploadData,location){
-      let webhookUrl = this.WebhookConfig.value;
-      if(webhookUrl.length===0){
-        return;
-      }
-      const urls = webhookUrl.split(';');
-      for (let i = 0; i < urls.length; i++) {
-        let url = urls[i];
-        if (!/^(http|https):\/\//.test(url)) {
-          url = 'http://' + url;
-        }
-        const project = {
-          project: {
-            id: this.image.project.toString(),
-            name: this.project.name
-          },
-          image: {
-            id: this.image.id.toString(),
-            name: this.image.filename,
-            thunmbnail:this.image.previewURL()
-          },
-          snapshot: {
-            id: uploadData.data.id,
-            url: this.host + uploadData.data.url,
-            previewURL: this.host + `/#/project/${this.project.id}/image/${this.image.id}/snapshot/${location}`,
-            pxLeft: canvas.height.toString()+'px',
-            pxTop: canvas.width.toString()+'px',
-          },
-          sendUrl: url,
-        };
-
-        try {
-          let data = await Cytomine.instance.api.post('/webhook.json', project);
-          this.$notify({type: 'success', text: data.data});
-        }
-        catch (error) {
-          this.$notify({type: 'error', text: error});
-        }
-      }
-
     },
     shortkeyHandler(key) {
       switch(key) {
@@ -597,7 +500,8 @@ export default {
           slice: this.slice.id,
           user: layer.id,
           term: this.termsToAssociate,
-          track: this.tracksToAssociate
+          track: this.tracksToAssociate,
+          geometry: this.activeTool,
         });
 
         try {

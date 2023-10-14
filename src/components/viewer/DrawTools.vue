@@ -635,13 +635,13 @@ export default {
 
     async drawCircle(){
       let location = this.createWKTCircle(this.imageWrapper.view.center,Math.sqrt(1 / Math.PI));
-      await this.drawLocation(location);
+      await this.drawLocation(location,'circle');
     },
     async drawSquare(){
       let location = this.createWKTSquare(this.imageWrapper.view.center,1);
-      await this.drawLocation(location);
+      await this.drawLocation(location,'rectangle');
     },
-    async drawLocation(location) {
+    async drawLocation(location,geometry) {
       for (const [idx, layer] of this.activeLayers.entries()) {
         let annot = new Annotation({
           location: location,
@@ -649,7 +649,8 @@ export default {
           slice: this.slice.id,
           user: layer.id,
           term: this.termsToAssociate,
-          track: this.tracksToAssociate
+          track: this.tracksToAssociate,
+          geometry: geometry,
         });
         try {
           await annot.save();
@@ -784,6 +785,7 @@ export default {
       try {
         let annot = feature.properties.annot;
         await Annotation.delete(annot.id);
+        this.$store.commit(this.imageModule+'removeAnnot', annot);
         this.$eventBus.$emit('deleteAnnotation', annot);
         this.$store.commit(this.imageModule + 'addAction', {annot: annot, type: Action.DELETE});
       }
@@ -846,7 +848,8 @@ export default {
         slice: this.slice.id,
         user: this.currentUser.id,
         term: this.copiedAnnot.term,
-        track: this.copiedAnnot.track
+        track: this.copiedAnnot.track,
+        geometry: this.activeTool,
       });
 
       try {
