@@ -437,6 +437,15 @@
       <span class="icon is-small"><i class="fas fa-redo"></i></span>
     </button>
   </div>
+  <div v-if="configUI['project-explore-annotation-dimension']" class="buttons has-addons are-small">
+    <button
+      v-tooltip="$t('display annot dimension')"
+      class="button" :class="{'is-selected': isAllShow}"
+      @click="isShowAllAnnotationDimension"
+    >
+      <span class="icon is-small"><i class="fas fa-eye"></i></span>
+    </button>
+  </div>
 </div>
 </template>
 
@@ -612,6 +621,9 @@ export default {
     nbActiveLayers() {
       return this.activeLayers.length;
     },
+    isAllShow(){
+      return this.$store.getters[this.imageModule+'isAllShow'];
+    },
   },
   watch: {
     noActiveLayer(value) {
@@ -632,7 +644,14 @@ export default {
     }
   },
   methods: {
-
+    isShowAllAnnotationDimension() {
+      if(!this.isAllShow){
+        this.$store.commit(this.imageModule+'showAllMeasurements');
+      }
+      else {
+        this.$store.commit(this.imageModule+'hideAllMeasurements');
+      }
+    } ,
     async drawCircle(){
       let location = this.createWKTCircle(this.imageWrapper.view.center,Math.sqrt(1 / Math.PI));
       await this.drawLocation(location,'circle');
@@ -865,6 +884,7 @@ export default {
         this.$eventBus.$emit('addAnnotation', annot);
         this.$eventBus.$emit('selectAnnotation', {index: this.index, annot});
         this.$store.commit(this.imageModule + 'addAction', {annot, type: Action.CREATE});
+
       }
       catch(err) {
         console.log(err);

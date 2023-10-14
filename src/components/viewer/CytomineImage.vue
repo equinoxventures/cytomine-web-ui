@@ -235,7 +235,7 @@
 
     <scale-line :image="image" :zoom="zoom" :mousePosition="projectedMousePosition" />
 
-    <annotations-container :index="index" @centerView="centerViewOnAnnot" @showDimensions="showDimensions"/>
+    <annotations-container :index="index" @centerView="centerViewOnAnnot"/>
 
     <div class="custom-overview" ref="overview">
     </div>
