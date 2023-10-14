@@ -785,6 +785,7 @@ export default {
       try {
         let annot = feature.properties.annot;
         await Annotation.delete(annot.id);
+        this.$store.commit(this.imageModule+'removeAnnot', annot);
         this.$eventBus.$emit('deleteAnnotation', annot);
         this.$store.commit(this.imageModule + 'addAction', {annot: annot, type: Action.DELETE});
       }

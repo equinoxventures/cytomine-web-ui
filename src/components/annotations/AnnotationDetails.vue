@@ -347,23 +347,17 @@ export default {
       return !!this.$store.getters[this.imageModule+'showMeasurements'][this.annotation.id];
     },
     isCanShowMeasurements(){
-      console.log(this.annotation);
       return ['rectangle', 'circle', 'line'].includes(this.annotation.geometry);
     }
   },
   methods: {
     toggleAnnot() {
-      if (this.isChecked) {
+      if (this.$store.getters[this.imageModule+'showMeasurements'][this.annotation.id]) {
         this.$store.commit(this.imageModule+'removeAnnot', this.annotation);
       }
       else {
         this.$store.commit(this.imageModule+'addAnnot', this.annotation);
       }
-    },
-    distance(point1, point2) {
-      let dx = point2[0].toFixed(2) - point1[0].toFixed(2);
-      let dy = point2[1].toFixed(2) - point1[1].toFixed(2);
-      return Math.sqrt(dx * dx + dy * dy);
     },
     isPropDisplayed(prop) {
       return this.configUI[`project-explore-annotation-${prop}`];
@@ -376,8 +370,8 @@ export default {
 
     async newTerm(term) { // a new term was added to the ontology
       this.$emit('addTerm', term);
-      this.$store.dispatch('currentProject/fetchOntology');
-      this.addTerm(term.id);
+      await this.$store.dispatch('currentProject/fetchOntology');
+      await this.addTerm(term.id);
     },
 
     async addTerm(idTerm) {
@@ -487,6 +481,7 @@ export default {
     async deleteAnnot() {
       try {
         await this.annotation.delete();
+        this.$store.commit(this.imageModule+'removeAnnot', this.annotation);
         this.$emit('deletion');
       }
       catch(err) {

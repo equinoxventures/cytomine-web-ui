@@ -24,13 +24,18 @@ export default {
   },
   mutations: {
     addAnnot(state,annot){
-      Vue.set(state.showMeasurements, annot.id, annot);
+      if(['rectangle', 'circle', 'line'].includes(annot.geometry)){
+        Vue.set(state.showMeasurements, annot.id, annot);
+      }
     },
     removeAnnot(state, annot) {
-      delete state.showMeasurements[annot.id];
+      if (state.showMeasurements[annot.id]){
+        delete state.showMeasurements[annot.id];
+        state.showMeasurements = {...state.showMeasurements};
+      }
     }
   },
   getters: {
     showMeasurements: state => state.showMeasurements,
-  }
+  },
 };
