@@ -439,11 +439,20 @@
   </div>
   <div v-if="configUI['project-explore-annotation-dimension']" class="buttons has-addons are-small">
     <button
+      v-if="isToolDisplayed('annot-dimension')"
       v-tooltip="$t('display annot dimension')"
       class="button" :class="{'is-selected': isAllShow}"
       @click="isShowAllAnnotationDimension"
     >
       <span class="icon is-small"><i class="fas fa-eye"></i></span>
+    </button>
+    <button
+      v-if="isToolDisplayed('snapshot-dimension')"
+      v-tooltip="$t('display snapshot dimension')"
+      class="button" :class="{'is-selected': snapshotDisplayDimension}"
+      @click="updateSnapshotDisplayDimension"
+    >
+      <span class="icon is-small"><i class="fas fa-eye-dropper"></i></span>
     </button>
   </div>
 </div>
@@ -474,6 +483,7 @@ export default {
   props: {
     index: String,
     drawing: Boolean,
+    snapshotDisplayDimension: Boolean,
   },
   data() {
     return {
@@ -644,6 +654,9 @@ export default {
     }
   },
   methods: {
+    updateSnapshotDisplayDimension(){
+      this.$emit('update:snapshotDisplayDimension', !this.snapshotDisplayDimension);
+    },
     isShowAllAnnotationDimension() {
       if(!this.isAllShow){
         this.$store.commit(this.imageModule+'showAllMeasurements');

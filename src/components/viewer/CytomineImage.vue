@@ -143,7 +143,8 @@
 
 
     <div v-if="configUI['project-tools-main']" class="draw-tools">
-      <draw-tools :index="index" :drawing="drawing" @screenshot="takeScreenshot()" @snapshot="takeSnapshot()"/>
+      <draw-tools :index="index" :drawing="drawing" :snapshotDisplayDimension="snapshotDisplayDimension"
+                  @update:snapshotDisplayDimension="snapshotDisplayDimension = $event" @screenshot="takeScreenshot()" @snapshot="takeSnapshot()"/>
     </div>
 
     <div class="panels">
@@ -329,6 +330,7 @@ export default {
       format: new WKT(),
       drawing: false,
       ignoreDraw:false,
+      snapshotDisplayDimension: false,
       WebhookConfig: new Configuration({key: constants.CONFIG_KEY_WEBHOOK_URL, value: '', readingRole: 'all'}),
       ScrollZoomConfig: new Configuration({key: constants.CONFIG_KEY_SCROLL_ZOOM, value: '', readingRole: 'all'}),
       AnnotationLineColorConfig: new Configuration({key: constants.CONFIG_KEY_ANNOTATION_LINE_COLOR, value: '', readingRole: 'all'}),
@@ -787,7 +789,8 @@ export default {
       document.querySelector('.map-container').style.height = containerHeight+'px';
 
       let a = document.createElement('a');
-      a.href = await this.$html2canvas(document.querySelector('.vl-map'), {type: 'dataURL'});
+      let map = this.snapshotDisplayDimension ? document.querySelector('.vl-map') : document.querySelector('.ol-unselectable');
+      a.href = await this.$html2canvas(map, {type: 'dataURL'});
       let imageName = 'image_' + this.image.id.toString() + '_project_' + this.image.project.toString() + '.png';
       a.download = imageName;
       a.click();
@@ -798,7 +801,8 @@ export default {
       try {
         let containerHeight = document.querySelector('.map-container').clientHeight;
         document.querySelector('.map-container').style.height = containerHeight+'px';
-        const canvas = await this.$html2canvas(document.querySelector('.vl-map'));
+        let map = this.snapshotDisplayDimension ? document.querySelector('.vl-map') : document.querySelector('.ol-unselectable');
+        const canvas = await this.$html2canvas(map);
         let extent =  this.$refs.view.$view.calculateExtent();
         let polygon = fromExtent(extent);
         let format = new WKT();
@@ -820,7 +824,8 @@ export default {
         let bottomRight = this.$refs.map.$map.getPixelFromCoordinate(getBottomRight(extent));
         let containerHeight = document.querySelector('.map-container').clientHeight;
         document.querySelector('.map-container').style.height = containerHeight+'px';
-        const canvas = await this.$html2canvas(document.querySelector('.vl-map'));
+        let map = this.snapshotDisplayDimension ? document.querySelector('.vl-map') : document.querySelector('.ol-unselectable');
+        const canvas = await this.$html2canvas(map);
         let exportCanvas = document.createElement('canvas');
         // Subtract 4 pixels (2 for top and 2 for bottom) from the height
         exportCanvas.height = bottomRight[1] - topLeft[1] - 4;
