@@ -171,6 +171,8 @@ export default {
             {key: 'project-tools-delete', label: 'delete', icon: 'fas fa-trash-alt', parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-copy-paste', label: 'copy-paste', icon: 'fas fa-copy', parentConfiguration: 'project-tools-main'},
             {key: 'project-tools-undo-redo', label: 'undo-redo', icon: 'fas fa-undo', parentConfiguration: 'project-tools-main'},
+            {key: 'project-tools-annot-dimension', label: 'annot-dimension', icon: 'fas fa-eye', parentConfiguration: 'project-tools-main'},
+            {key: 'project-tools-snapshot-dimension', label: 'snapshot-dimension', icon: 'fas fa-eye-dropper', parentConfiguration: 'project-tools-main'},
           ]
         }
       ]

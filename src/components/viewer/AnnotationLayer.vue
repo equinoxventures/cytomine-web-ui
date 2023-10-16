@@ -232,7 +232,7 @@ export default {
         showTrack: true,
         kmeans: true
       }).fetchAll();
-
+      this.$store.commit(this.imageModule+'updateAnnot', annots.array);
       return annots.array;
     },
 

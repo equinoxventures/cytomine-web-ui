@@ -19,7 +19,8 @@ import Vue from 'vue';
 export default {
   state() {
     return {
-      showMeasurements: {}
+      showMeasurements: {},
+      annotArray: {},
     };
   },
   mutations: {
@@ -33,9 +34,32 @@ export default {
         delete state.showMeasurements[annot.id];
         state.showMeasurements = {...state.showMeasurements};
       }
-    }
+    },
+    updateAnnot(state, annotArray){
+      state.annotArray = annotArray.filter(annot => {
+        return ['rectangle', 'circle', 'line'].includes(annot.geometry);
+      });
+    },
+    showAllMeasurements(state){
+      for (let annot of state.annotArray) {
+        if(['rectangle', 'circle', 'line'].includes(annot.geometry)){
+          if(!Object.keys(state.showMeasurements).includes(annot.id)){
+            Vue.set(state.showMeasurements, annot.id, annot);
+          }
+        }
+      }
+    },
+    hideAllMeasurements(state) {
+      state.showMeasurements = {};
+    },
+
   },
   getters: {
     showMeasurements: state => state.showMeasurements,
+    isAllShow: state => {
+      if (Object.keys(state.showMeasurements).length === 0 && state.annotArray.length === 0) return false;
+      return Object.keys(state.showMeasurements).length === state.annotArray.length;
+    }
   },
+
 };
