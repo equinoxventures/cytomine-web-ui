@@ -189,7 +189,7 @@ export default {
     },
     scrollHorizontally(event) {
       event.preventDefault();
-      const scaleFactor = 10;
+      const scaleFactor = 1;
       this.$refs.imageSelector.scrollLeft += event.deltaY * scaleFactor;
     }
   },
