@@ -26,6 +26,7 @@ export default {
       links: [],
       linkMode: 'ABSOLUTE',
       imageSelector: false,
+      ImageSwitcher: false,
       activeImage: 0,
       indexNextImage: 0,
 
@@ -37,9 +38,12 @@ export default {
     setImageSelector(state, value) {
       state.imageSelector = value;
     },
-
+    setImageSwitcher(state, value) {
+      state.ImageSwitcher = value;
+    },
     addImage(state) {
       state.imageSelector = false;
+      state.ImageSwitcher =false;
       state.activeImage = state.indexNextImage;
       state.indexNextImage++;
     },
