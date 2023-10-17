@@ -34,6 +34,7 @@
       />
     </div>
 
+    <image-switcher style="position: relative;top: -50px;"/>
     <image-selector />
 
     <!-- Emit event when a hotkey is pressed (to rework once https://github.com/iFgR/vue-shortkey/issues/78 is implemented) -->
@@ -47,7 +48,7 @@ import {get} from '@/utils/store-helpers';
 
 import CytomineImage from './CytomineImage';
 import ImageSelector from './ImageSelector';
-
+import ImageSwitcher from './ImageSwitcher.vue';
 import viewerModuleModel from '@/store/modules/project_modules/viewer';
 
 import constants from '@/utils/constants.js';
@@ -55,9 +56,11 @@ import shortcuts from '@/utils/shortcuts.js';
 
 import {ImageInstance, SliceInstance, Annotation} from 'cytomine-client-c';
 
+
 export default {
   name: 'cytomine-viewer',
   components: {
+    ImageSwitcher,
     CytomineImage,
     ImageSelector
   },

@@ -138,6 +138,10 @@ const routes = [
         component: ProjectConfiguration
       },
       {
+        //Put the toggle image display on Page NotFound
+        path: 'image///slice/*'
+      },
+      {
         path: '*',
         component: PageNotFound
       }
