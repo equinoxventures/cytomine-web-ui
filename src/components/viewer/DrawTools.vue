@@ -1290,16 +1290,6 @@ $colorActiveIcon: #fff;
   display: inline-block;
 }
 
-
-//.icon.is-small{
-//  font-size: 1rem;
-//}
-.is-large {
-  @extend .icon;
-  font-size: 1rem;
-}
-
-
 .icon-number {
   position: absolute;
   top: 50%;
