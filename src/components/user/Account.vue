@@ -150,10 +150,19 @@
       <h3>
         <strong>{{'Incremental Scroll and Zoom'}}</strong>
         <button
-          :class="['button scroll-zoom', ScrollZoomConfig.value ? 'is-danger' : 'is-success']"
-          @click="ShowScrollZoom"
+          :class="['button custom', currentUser.scrollZoom ? 'is-danger' : 'is-success']"
+          @click="UpdateScrollZoom"
         >
-          {{ ScrollZoomConfig.value ? $t('disable') : $t('enable') }}
+          {{ updatedUser.scrollZoom ? $t('disable') : $t('enable') }}
+        </button>
+      </h3>
+      <h3 style="margin-top: 10px">
+        <strong>{{'Bigger Buttons'}}</strong>
+        <button
+          :class="['button custom', currentUser.biggerButtons ? 'is-danger' : 'is-success']"
+          @click="updateBiggerButtons"
+        >
+          {{ currentUser.biggerButtons ? $t('disable') : $t('enable') }}
         </button>
       </h3>
     </div>
@@ -203,10 +212,9 @@
 import {get} from '@/utils/store-helpers';
 import {changeLanguageMixin} from '@/lang.js';
 import _ from 'lodash';
-import {User,Configuration} from 'cytomine-client-c';
+import {User} from 'cytomine-client-c';
 import {rolesMapping} from '@/utils/role-utils';
 import copyToClipboard from 'copy-to-clipboard';
-import constants from '@/utils/constants';
 
 export default {
   name: 'Account',
@@ -225,7 +233,6 @@ export default {
         {value: 'FR', name:'Français'},
         {value: 'ES', name:'Español'}
       ],
-      ScrollZoomConfig: new Configuration({key: constants.CONFIG_KEY_SCROLL_ZOOM, value: '', readingRole: 'all'}),
     };
   },
   computed: {
@@ -320,16 +327,10 @@ export default {
         this.$notify({type: 'error', text: this.$t('notif-error-keys-not-regenerated')});
       }
     },
-    async ShowScrollZoom() {
+    async UpdateScrollZoom(){
       try {
-        if(this.ScrollZoomConfig.value) {
-          this.ScrollZoomConfig.value = '';
-          await this.ScrollZoomConfig.delete();
-        }
-        else {
-          this.ScrollZoomConfig.value = 'true';
-          await this.ScrollZoomConfig.save();
-        }
+        this.updatedUser.scrollZoom = !this.updatedUser.scrollZoom;
+        await this.$store.dispatch('currentUser/updateUser', this.updatedUser);
         this.$notify({type: 'success', text: 'Scroll and Zoom config successfully updated'});
       }
       catch(error) {
@@ -337,22 +338,24 @@ export default {
         this.$notify({type: 'error', text: 'Failed to update the Scroll and Zoom config message'});
       }
     },
-
+    async updateBiggerButtons(){
+      try {
+        this.updatedUser.biggerButtons = !this.updatedUser.biggerButtons;
+        await this.$store.dispatch('currentUser/updateUser', this.updatedUser);
+        this.$notify({type: 'success', text: 'Bigger buttons config successfully updated'});
+      }
+      catch(error) {
+        console.log(error);
+        this.$notify({type: 'error', text: 'Failed to update the Bigger buttons config message'});
+      }
+    },
   },
-  async created() {
-    try {
-      await this.ScrollZoomConfig.fetch();
-    }
-    catch (error) {
-      // no set
-    }
-  }
 };
 </script>
 
 <style scoped>
 
-.button.scroll-zoom{
+.button.custom{
   @extend .button;
   margin-left: 1em;
   margin-top: -2.5px;
