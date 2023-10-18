@@ -21,7 +21,7 @@
       :class="{'is-selected': activeTool === 'select'}"
       @click="activateTool('select')"
     >
-      <span class="icon is-small"><i class="fas fa-mouse-pointer"></i></span>
+      <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'"><i class="fas fa-mouse-pointer"></i></span>
     </button>
   </div>
 
@@ -38,7 +38,7 @@
         :disabled="disabledDraw"
         @click="showTermSelector = !showTermSelector"
       >
-        <span class="icon is-small"><i class="fas fa-hashtag"></i></span>
+        <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'"><i class="fas fa-hashtag"></i></span>
       </button>
 
       <div class="color-preview" :style="{background: backgroundTermsNewAnnot}">
@@ -67,7 +67,7 @@
         :disabled="disabledDraw"
         @click="showTrackSelector = !showTrackSelector"
       >
-        <span class="icon is-small"><i class="fas fa-route"></i></span>
+        <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'"><i class="fas fa-route"></i></span>
       </button>
 
       <div class="color-preview" :style="{'border-color': backgroundTracksNewAnnot}">
@@ -100,7 +100,7 @@
         :class="{'is-selected': activeTool === 'point'}"
         @click="activateTool('point')"
       >
-        <span class="icon is-small"><i class="fas fa-map-pin"></i></span>
+        <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'"><i class="fas fa-map-pin"></i></span>
       </button>
 
       <button
@@ -111,7 +111,7 @@
         :class="{'is-selected': activeTool === 'line'}"
         @click="activateTool('line')"
       >
-        <span class="icon is-small"><i class="fas fa-minus"></i></span>
+        <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'"><i class="fas fa-minus"></i></span>
       </button>
 
       <button
@@ -122,7 +122,7 @@
         :class="{'is-selected': activeTool === 'arrow'}"
         @click="activateTool('arrow')"
       >
-        <span class="icon is-small"><i class="fas fa-arrow-right"></i></span>
+        <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'"><i class="fas fa-arrow-right"></i></span>
       </button>
 
       <button
@@ -133,7 +133,7 @@
         :class="{'is-selected': activeTool === 'freehand-line'}"
         @click="activateTool('freehand-line')"
       >
-        <span class="icon is-small">
+        <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'">
           <icon-line-free-hand />
         </span>
       </button>
@@ -141,7 +141,7 @@
       <!-- QUESTION: redefine expected behaviour
       <button class="button" :disabled="disabledDraw" title="Arrow"
               @click="activateTool('arrow')" :class="{'is-selected': activeTool === 'arrow'}">
-          <span class="icon is-small"><i class="fas fa-long-arrow-right"></i></span>
+          <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'"><i class="fas fa-long-arrow-right"></i></span>
       </button> -->
 
       <button
@@ -152,7 +152,7 @@
         :class="{'is-selected': activeTool === 'rectangle'}"
         @click="activateTool('rectangle')"
       >
-        <span class="icon is-small"><i class="far fa-square"></i></span>
+        <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'"><i class="far fa-square"></i></span>
       </button>
 
 
@@ -165,7 +165,7 @@
         :class="{'is-selected': activeTool === 'circle'}"
         @click="activateTool('circle')"
       >
-        <span class="icon is-small"><i class="far fa-circle"></i></span>
+        <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'"><i class="far fa-circle"></i></span>
       </button>
       <button
         v-if="isToolDisplayed('polygon')"
@@ -175,7 +175,7 @@
         :class="{'is-selected': activeTool === 'polygon'}"
         @click="activateTool('polygon')"
       >
-        <span class="icon is-small"><i class="fas fa-draw-polygon"></i></span>
+        <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'"><i class="fas fa-draw-polygon"></i></span>
       </button>
 
       <button
@@ -186,7 +186,7 @@
         :class="{'is-selected': activeTool === 'freehand-polygon'}"
         @click="activateTool('freehand-polygon')"
       >
-        <span class="icon is-small">
+        <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'">
           <icon-polygon-free-hand />
         </span>
       </button>
@@ -199,7 +199,7 @@
         class="button"
         @click="drawSquare('1mm^2-square')"
       >
-        <span class="icon is-small"><i class="far fa-square"></i><span class="icon-number">1</span></span>
+        <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'"><i class="far fa-square"></i><span class="icon-number">1</span></span>
       </button>
       <button
         v-if="isToolDisplayed('1mm^2-circle')"
@@ -208,7 +208,7 @@
         class="button"
         @click="drawCircle()"
       >
-        <span class="icon is-small"><i class="far fa-circle"></i><span class="icon-number">1</span></span>
+        <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'"><i class="far fa-circle"></i><span class="icon-number">1</span></span>
       </button>
     </div>
 
@@ -223,7 +223,7 @@
         :class="{'is-success': !isToolDisabled('accept')}"
         @click="accept()"
       >
-      <span class="icon is-small"><i class="fas fa-check"></i></span>
+      <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'"><i class="fas fa-check"></i></span>
     </button>
     <button
         :disabled="isToolDisabled('reject')"
@@ -232,7 +232,7 @@
         :class="{'is-danger': !isToolDisabled('reject')}"
         @click="reject()"
       >
-      <span class="icon is-small"><i class="fas fa-minus"></i></span>
+      <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'"><i class="fas fa-minus"></i></span>
     </button>
     </div>
   </template>
@@ -245,7 +245,7 @@
       class="button"
       @click="takeScreenshot()"
     >
-      <span class="icon is-small"><i class="fas fa-camera"></i></span>
+      <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'"><i class="fas fa-camera"></i></span>
     </button>
     <button
       v-if="isToolDisplayed('snapshot')"
@@ -254,7 +254,7 @@
       class="button"
       @click="takeSnapshot()"
     >
-      <span class="icon is-small"><i class="fas fa-image"></i></span>
+      <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'"><i class="fas fa-image"></i></span>
     </button>
     <button
       v-if="isToolDisplayed('draw-snapshot')"
@@ -264,7 +264,7 @@
       :class="{'is-selected': activeTool === 'draw-snapshot'}"
       @click="activateTool('draw-snapshot')"
     >
-      <span class="icon is-small"><i class="fas fa-expand"></i></span>
+      <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'"><i class="fas fa-expand"></i></span>
     </button>
   </div>
 
@@ -276,7 +276,7 @@
       class="button" :class="{'is-selected': displayAnnotDetails && selectedFeature}"
       @click="displayAnnotDetails = !displayAnnotDetails"
     >
-      <span class="icon is-small"><i class="fas fa-info"></i></span>
+      <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'"><i class="fas fa-info"></i></span>
     </button>
   </div>
 
@@ -288,7 +288,7 @@
       class="button"
       @click="fill()"
     >
-      <span class="icon is-small"><i class="fas fa-fill"></i></span>
+      <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'"><i class="fas fa-fill"></i></span>
     </button>
 
     <button
@@ -299,7 +299,7 @@
       :class="{'is-selected': activeEditTool === 'modify'}"
       @click="activateEditTool('modify')"
     >
-      <span class="icon is-small"><i class="fas fa-edit"></i></span>
+      <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'"><i class="fas fa-edit"></i></span>
     </button>
 
     <button
@@ -310,7 +310,7 @@
       :class="{'is-selected': activeEditTool === 'correct-add'}"
       @click="activateEditTool('correct-add')"
     >
-      <span class="icon is-small"><i class="superscript fas fa-plus"></i><i class="fas fa-pencil-alt"></i></span>
+      <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'"><i class="superscript fas fa-plus"></i><i class="fas fa-pencil-alt"></i></span>
     </button>
 
     <button
@@ -321,7 +321,7 @@
       :class="{'is-selected': activeEditTool === 'correct-remove'}"
       @click="activateEditTool('correct-remove')"
     >
-      <span class="icon is-small"><i class="superscript fas fa-minus"></i><i class="fas fa-pencil-alt"></i></span>
+      <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'"><i class="superscript fas fa-minus"></i><i class="fas fa-pencil-alt"></i></span>
     </button>
 
     <button
@@ -332,7 +332,7 @@
       :class="{'is-selected': activeEditTool === 'translate'}"
       @click="activateEditTool('translate')"
     >
-      <span class="icon is-small"><i class="fas fa-arrows-alt"></i></span>
+      <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'"><i class="fas fa-arrows-alt"></i></span>
     </button>
 
     <button
@@ -343,7 +343,7 @@
         :class="{'is-selected': activeEditTool === 'rescale'}"
         @click="activateEditTool('rescale')"
     >
-      <span class="icon is-small"><i class="fas fa-expand"></i></span>
+      <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'"><i class="fas fa-expand"></i></span>
     </button>
 
     <button
@@ -354,7 +354,7 @@
       :class="{'is-selected': activeEditTool === 'rotate'}"
       @click="activateEditTool('rotate')"
     >
-      <span class="icon is-small"><i class="fas fa-sync-alt"></i></span>
+      <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'"><i class="fas fa-sync-alt"></i></span>
     </button>
 
     <button
@@ -364,7 +364,7 @@
       class="button"
       @click="confirmDeletion()"
     >
-      <span class="icon is-small"><i class="far fa-trash-alt"></i></span>
+      <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'"><i class="far fa-trash-alt"></i></span>
     </button>
   </div>
 
@@ -375,7 +375,7 @@
       class="button"
       @click="copy()"
     >
-      <span class="icon is-small"><i class="fas fa-copy"></i></span>
+      <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'"><i class="fas fa-copy"></i></span>
     </button>
     <button
       :disabled="disabledPaste"
@@ -383,7 +383,7 @@
       class="button"
       @click="paste()"
     >
-      <span class="icon is-small"><i class="fas fa-paste"></i></span>
+      <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'"><i class="fas fa-paste"></i></span>
     </button>
     <div class="special-paste-selection" v-click-outside="() => showRepeatSelector = false" v-if="maxRepeats > 0">
       <button
@@ -392,7 +392,7 @@
         class="button"
         @click="showRepeatSelector = !showRepeatSelector"
       >
-      <span class="icon is-small">
+      <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'">
         <i class="fas fa-paste"></i>
         <i class="fas fa-star special-paste-icon"></i>
       </span>
@@ -425,7 +425,7 @@
       class="button"
       @click="undo()"
     >
-      <span class="icon is-small"><i class="fas fa-undo"></i></span>
+      <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'"><i class="fas fa-undo"></i></span>
     </button>
 
     <button
@@ -434,7 +434,7 @@
       class="button"
       @click="redo()"
     >
-      <span class="icon is-small"><i class="fas fa-redo"></i></span>
+      <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'"><i class="fas fa-redo"></i></span>
     </button>
   </div>
   <div v-if="configUI['project-explore-annotation-dimension']" class="buttons has-addons are-small">
@@ -444,7 +444,7 @@
       class="button" :class="{'is-selected': isAllShow}"
       @click="isShowAllAnnotationDimension"
     >
-      <span class="icon is-small"><i class="fas fa-eye"></i></span>
+      <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'"><i class="fas fa-eye"></i></span>
     </button>
     <button
       v-if="isToolDisplayed('snapshot-dimension')"
@@ -452,7 +452,7 @@
       class="button" :class="{'is-selected': snapshotDisplayDimension}"
       @click="updateSnapshotDisplayDimension"
     >
-      <span class="icon is-small"><i class="fas fa-eye-dropper"></i></span>
+      <span class="icon is-small" :style="currentUser.biggerButtons ? '' : 'font-size: 1rem;'"><i class="fas fa-eye-dropper"></i></span>
     </button>
   </div>
 </div>
@@ -1290,8 +1290,13 @@ $colorActiveIcon: #fff;
   display: inline-block;
 }
 
-.icon.is-small {
-  font-size: 1rem; /* adjust as needed to increase the size of the circle */
+
+//.icon.is-small{
+//  font-size: 1rem;
+//}
+.is-large {
+  @extend .icon;
+  font-size: 1rem;
 }
 
 

@@ -332,12 +332,12 @@ export default {
       ignoreDraw:false,
       snapshotDisplayDimension: false,
       WebhookConfig: new Configuration({key: constants.CONFIG_KEY_WEBHOOK_URL, value: '', readingRole: 'all'}),
-      ScrollZoomConfig: new Configuration({key: constants.CONFIG_KEY_SCROLL_ZOOM, value: '', readingRole: 'all'}),
       AnnotationLineColorConfig: new Configuration({key: constants.CONFIG_KEY_ANNOTATION_LINE_COLOR, value: '', readingRole: 'all'}),
       MillimeterConfig: new Configuration({key: constants.CONFIG_KEY_MILLIMETER, value: '', readingRole: 'all'}),
     };
   },
   computed: {
+    currentUser: get('currentUser/user'),
     document() {
       return document;
     },
@@ -559,7 +559,7 @@ export default {
           };
         }
       });
-      if(!this.ScrollZoomConfig.value){
+      if(!this.currentUser.scrollZoom){
         this.$nextTick(() => {
           const interactions = this.$refs.map.$map.getInteractions();
           const mouseWheelZoomInteraction = interactions.getArray().find(interaction => interaction instanceof MouseWheelZoom);
@@ -1010,12 +1010,6 @@ export default {
     }
     catch(error) {
       // no webhook message currently set
-    }
-    try {
-      await this.ScrollZoomConfig.fetch();
-    }
-    catch (error) {
-      // no set
     }
     try {
       await new ImageConsultation({image: this.image.id}).save();
