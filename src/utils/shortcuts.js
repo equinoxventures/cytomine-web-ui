@@ -1,7 +1,7 @@
-const {detect} = require('detect-browser');
-const browser = detect();
-const shortkey = (browser && browser.os === 'Mac OS') ? 'meta' : 'ctrl';
-
+// const {detect} = require('detect-browser');
+// const browser = detect();
+// const shortkey = (browser && browser.os === 'Mac OS') ? 'meta' : 'ctrl';
+const shortkey = 'ctrl';
 // Key list reference: https://github.com/iFgR/vue-shortkey#key-list
 export default Object.freeze({
   // 'general-close-modal': ['esc'], // Handled by Bulma
