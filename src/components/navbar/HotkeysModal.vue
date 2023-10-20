@@ -41,6 +41,7 @@
               <i v-else-if="k === 'arrowup'" class="fas fa-arrow-up"></i>
               <i v-else-if="k === 'arrowdown'" class="fas fa-arrow-down"></i>
               <span v-else-if="k === 'meta'">&#8984; Cmd</span>
+              <span v-else-if="k === 'ctrl'">&#x2303; Ctrl</span>
               <span v-else-if="k === 'shift'">&#8679; Shift</span>
               <span v-else-if="k === 'alt'">&#8997; Alt</span>
               <span v-else-if="k === 'pageup'">Page Up</span>
